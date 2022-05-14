@@ -142,10 +142,12 @@
     <ClCompile Include="Equation.cpp" />
     <ClCompile Include="fornulaGA.cpp" />
     <ClCompile Include="GA.cpp" />
+    <ClCompile Include="Global.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Equation.h" />
     <ClInclude Include="GA.h" />
+    <ClInclude Include="Global.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

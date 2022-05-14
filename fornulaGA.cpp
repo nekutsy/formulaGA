@@ -1,23 +1,29 @@
 ﻿#include <iostream>
+#include <ctime>
+
 #include "Equation.h"
 #include "GA.h"
+#include "Global.h"
 
 int main() {
-	parents.resize(parentsCount);
-	generation.resize(generationSize);
-	result.resize(generationSize);
-	rating.resize(generationSize);
+	srand(time(0));
 
-	std::cout << "parents: " << std::endl;
 	for (int i = 0; i < parentsCount; i++) {
-		parents[i] = new Member(std::vector<Member*> {new Constant(members[0]), new Constant(members[0])}, n_plus);
-		std::cout << parents[i]->members.size() << std::endl;
-		std::cout << parents[i]->perform().name << " = " << parents[i]->perform().value << std::endl;
+		std::cout << 111;
+		parents[i] = new Member(std::vector<Member*> {new Constant(0), new Constant(0)}, n_plus);
+			//std::cout << parents[i]->perform().name << " = " << parents[i]->perform().value << std::endl;
 	}
-	createGeneration();
-	
+
+	for (int i = 0; i < 1500; i++) {
+		std::cout << "step: " << i << std::endl;
+		createGeneration();
+		performGeneration();
+		selection();
+		std::cout << std::endl;
+	}
 	std::cout << std::endl << "generation: " << std::endl;
-	for (int i = 0; i < generationSize; i++) {
-		std::cout << generation[i]->perform().name << " = " << generation[i]->perform().value << std::endl;
+	swapPreset(0);
+	for (int i = 0; i < parentsCount; i++) {
+		std::cout << parents[i]->perform().name << " = " << parents[i]->perform().value << std::endl << std::endl;
 	}
 }

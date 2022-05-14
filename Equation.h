@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <string>
+int const presetsCount = 4;
+#include "Global.h"
 
 enum operationsName {
 	n_plus = 0,
@@ -18,6 +20,7 @@ double minus(double left, double right);
 double mult(double left, double right);
 double divide(double left, double right);
 double sqrt(double left, double right);
+const int operationsCount = 5;
 
 class Operation {
 public:
@@ -40,19 +43,26 @@ public:
 	Member(std::vector<Member*> m, int OPERATION = 0);
 	~Member();
 	virtual Var perform();
+	virtual void resize();
 	int operation = 0;
+	std::array<Var, presetsCount> results;
 
+	int mSize;
 	int size;
 	std::vector<Member*> members;
+protected:
+	Member();
 };
 
 class Constant : public Member {
 public:
-	Constant(Var var);
+	Constant(int mNum);
 	virtual Var perform();
-	Var value;
+	virtual void resize();
+	int mType;
 };
 
 int membersCount(Member* p);
 Member* duplicate(Member* m);
 Member* getMember(Member* m, int num);
+void swapPreset(int preset);
