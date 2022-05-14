@@ -9,12 +9,11 @@ int main() {
 	srand(time(0));
 
 	for (int i = 0; i < parentsCount; i++) {
-		std::cout << 111;
 		parents[i] = new Member(std::vector<Member*> {new Constant(0), new Constant(0)}, n_plus);
 			//std::cout << parents[i]->perform().name << " = " << parents[i]->perform().value << std::endl;
 	}
 
-	for (int i = 0; i < 1500; i++) {
+	for (int i = 0; i < 1000; i++) {
 		std::cout << "step: " << i << std::endl;
 		createGeneration();
 		performGeneration();
@@ -24,6 +23,6 @@ int main() {
 	std::cout << std::endl << "generation: " << std::endl;
 	swapPreset(0);
 	for (int i = 0; i < parentsCount; i++) {
-		std::cout << parents[i]->perform().name << " = " << parents[i]->perform().value << std::endl << std::endl;
+		std::cout << parents[i]->results[0].name << " = " << parents[i]->results[0].value << std::endl << std::endl;
 	}
 }

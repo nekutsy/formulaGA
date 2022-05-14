@@ -11,8 +11,8 @@ double fitness(Member* m) {
 	int preset = nowPreset;
 	for (int i = 0; i < presetsCount; i++) {
 		swapPreset(i);
-		sizeW += -pow(m->size - 5, 4) * 0.2;
-		outW += -pow(expectedResults[nowPreset] - m->results[i].value, 2);
+		sizeW += -pow(m->size - expectedSize, 4) * sizeInfluence;
+		outW += -pow(expectedResults[nowPreset] - m->results[i].value, 2) * outInfluence;
 	}
 	swapPreset(preset);
 	return sizeW + outW;
@@ -23,7 +23,7 @@ void createGeneration() {
 	mutationCount += increasingMutability * -(mScore) * mScoreInfluence;
 	mutationCount = std::max(mutationCount, minMutability);
 	mutationCount = std::min(mutationCount, maxMutability);
-	std::cout << "mutationsCount: " << mutationCount << std::endl;
+	//std::cout << "mutationsCount: " << mutationCount << std::endl;
 	std::cout << "mScore: " << mScore << std::endl;
 
 	int childCount = generationSize / parentsCount;
@@ -51,7 +51,7 @@ void performGeneration() {
 }
 
 void selection() {
-	int dmScore = 0;
+	double dmScore = 0;
 	for (int i = 0; i < generationSize; i++) {
 		bool isImproved = false;
 		for (int j = 0; j < parentsCount; j++) {
@@ -66,47 +66,54 @@ void selection() {
 		generation[i]->~Member();
 		delete generation[i];
 
-		dmScore -= (1 - isImproved * 2);
+		dmScore -= (1 - isImproved * 3);
 	}
-	mScore += dmScore / generationSize;
+	mScore += dmScore / generationSize + 0.789;
 }
 
 void mutate(Member* m) {
 	int mCount = m->size;
 	Member* changingM;
 	do {
-		int mNum = rand() % mCount;
-		//std::cout << m->size << " " << mNum << std::endl;
-		//std::cout << m << std::endl;
-		changingM = getMember(m, mNum);
-	} while (changingM->operation == -1);
+		changingM = getMember(m, rand() % mCount);
+	} while (changingM->operation == -1 && rand() % 5);
 
-	int actionType = rand() % (operationsCount + 2);
-	if (changingM->mSize > 2)
-		actionType += rand() % 2;
+	if (changingM->operation == -1) {
+		int actionType = rand() % 1;
+		
+		switch (actionType) {
+		case 0:
+			(dynamic_cast<Constant*>(changingM))->mType = rand() % members.size();
+		}
+	}
+	else {
+		int actionType = rand() % (operationsCount + 2);
+		if (changingM->mSize > 2)
+			actionType += rand() % 2;
 
-	switch (actionType) { // add constant
-	case operationsCount: {
-		changingM->members.push_back(new Constant(rand() % members.size()));
-		changingM->resize();
-		break;
-	}
-	case operationsCount + 1: { // add member
-		changingM->members.push_back(randMember(2 + rand() % 10));
-		changingM->resize();
-		break;
-	}
-	case operationsCount + 2: { // delete member
-		int dm = rand() % changingM->mSize;
-		changingM->members[dm]->~Member();
-		delete changingM->members[dm];
-		changingM->members.erase(changingM->members.begin() + dm);
+		switch (actionType) { // add constant
+		case operationsCount: {
+			changingM->members.push_back(new Constant(rand() % members.size()));
+			changingM->resize();
+			break;
+		}
+		case operationsCount + 1: { // add member
+			changingM->members.push_back(randMember(2 + rand() % 10));
+			changingM->resize();
+			break;
+		}
+		case operationsCount + 2: { // delete member
+			int dm = rand() % changingM->mSize;
+			changingM->members[dm]->~Member();
+			delete changingM->members[dm];
+			changingM->members.erase(changingM->members.begin() + dm);
 
-		changingM->resize();
-		break;
-	}
-	default:
-		changingM->operation = actionType;
-		break;
+			changingM->resize();
+			break;
+		}
+		default:
+			changingM->operation = actionType;
+			break;
+		}
 	}
 }

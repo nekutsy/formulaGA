@@ -1,10 +1,4 @@
-#include "Global.h"
-
-double mutationCount = 15;
-int nowPreset = 0;
-double mScore = 0;
-std::vector<std::vector<Var>> presets = {
-	{//1
+{//1
 		Var(2, "2"),
 		Var(10, "10"),
 		Var(1, "1"),
@@ -104,12 +98,3 @@ std::vector<std::vector<Var>> presets = {
 		Var(0, "a"),
 		Var(0, "t")
 	},
-};
-std::vector<Var>& members = presets[0];
-
-extern std::array<double, presetsCount> expectedResults = {
-	50, 52, 460, 1800, -40, 10, 850, -730, -5, -38
-};
-
-std::array<Member*, parentsCount> parents;
-std::array<Member*, generationSize> generation;

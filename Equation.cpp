@@ -6,11 +6,11 @@
 
 std::vector<Operation>operations = {
 	Operation(" + ", plus),
-	Operation(" - ", minus),
+	//Operation(" - ", minus),
 	Operation(" * ", mult),
-	Operation(" / ", divide),
+	//Operation(" / ", divide),
 	Operation(" ^ ", pow),
-	Operation(" sqrt ", sqrt)
+	//Operation(" sqrt ", sqrt)
 };
 
 Var::Var(double VALUE, std::string NAME) : value(VALUE), name(NAME) {}
@@ -120,7 +120,7 @@ int membersCount(Member* p) {
 	return out;
 }
 
-Constant::Constant(int mType) : Member() {
+Constant::Constant(int M_TYPE) : Member(), mType(M_TYPE) {
 	for (int i = 0; i < presetsCount; i++)
 		results[i] = presets[i][mType];
 
