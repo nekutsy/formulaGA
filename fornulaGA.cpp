@@ -13,16 +13,28 @@ int main() {
 			//std::cout << parents[i]->perform().name << " = " << parents[i]->perform().value << std::endl;
 	}
 
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < 1000 && mScore > minScore; i++) {
 		std::cout << "step: " << i << std::endl;
+		std::cout << "mutationsCount: " << mutationCount << std::endl;
+		std::cout << "mScore: " << mScore << std::endl;
 		createGeneration();
 		performGeneration();
 		selection();
 		std::cout << std::endl;
 	}
-	std::cout << std::endl << "generation: " << std::endl;
+	std::cout << std::endl << "best: " << std::endl;
 	swapPreset(0);
 	for (int i = 0; i < parentsCount; i++) {
 		std::cout << parents[i]->results[0].name << " = " << parents[i]->results[0].value << std::endl << std::endl;
+	}
+
+	std::cout << std::endl << "matched: " << std::endl;
+	for (int i = 0; i < parentsCount; i++) {
+		bool m = true;
+		for (int j = 0; j < presetsCount; j++)
+			if (parents[i]->results[j].value != expectedResults[j])
+				m = false;
+		if (m)
+			std::cout << parents[i]->results[0].name << " = " << parents[i]->results[0].value << std::endl << std::endl;
 	}
 }
