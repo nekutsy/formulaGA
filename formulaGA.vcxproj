@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{eeb948c6-fdb5-463a-8af2-7c64723496e9}</ProjectGuid>
-    <RootNamespace>fornulaGA</RootNamespace>
+    <RootNamespace>formulaGA</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -140,7 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Equation.cpp" />
-    <ClCompile Include="fornulaGA.cpp" />
+    <ClCompile Include="formulaGA.cpp" />
     <ClCompile Include="GA.cpp" />
     <ClCompile Include="Global.cpp" />
   </ItemGroup>
