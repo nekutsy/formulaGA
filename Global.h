@@ -7,16 +7,16 @@ class Member;
 #include "Equation.h"
 
 extern int const presetsCount;
-const int parentsCount = 50;
-const int generationSize = 500;
+const int parentsCount = 250;
+const int generationSize = 5000;
 const int maxMemberQuantity = 10;
 const double increasingMutability = 5;
-const double maxMutability = 20;
+const double maxMutability = 150;
 const double minMutability = 5;
-const double mScoreInfluence = 0.01;
+const double mScoreInfluence = 0.05;
 const double maxScore = 5;
-const double minScore = -1;
-const int expectedSize = 3;
+const double minScore = -30;
+const int expectedSize = 5;
 const double sizeInfluence = 50;
 const double outInfluence = 1;
 

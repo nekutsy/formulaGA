@@ -11,7 +11,7 @@ double fitness(Member* m) {
 	int preset = nowPreset;
 	for (int i = 0; i < presetsCount; i++) {
 		swapPreset(i);
-		sizeW += -pow(m->size - expectedSize, 4) * sizeInfluence;
+		sizeW += -pow(m->size - expectedSize, 6) * sizeInfluence;
 		outW += -pow(expectedResults[nowPreset] - m->results[i].value, 2) * outInfluence;
 	}
 	swapPreset(preset);
@@ -23,8 +23,6 @@ void createGeneration() {
 	mutationCount += increasingMutability * -(mScore) * mScoreInfluence;
 	mutationCount = std::max(mutationCount, minMutability);
 	mutationCount = std::min(mutationCount, maxMutability);
-	//std::cout << "mutationsCount: " << mutationCount << std::endl;
-	std::cout << "mScore: " << mScore << std::endl;
 
 	int childCount = generationSize / parentsCount;
 	for (int i = 0; i < parentsCount; i++) {
@@ -68,7 +66,7 @@ void selection() {
 
 		dmScore -= (1 - isImproved * 3);
 	}
-	mScore += dmScore / generationSize + 0.789;
+	mScore += dmScore / generationSize + 0.9;
 }
 
 void mutate(Member* m) {

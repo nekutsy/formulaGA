@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-int const presetsCount = 10;
+int const presetsCount = 15;
 #include "Global.h"
 
 enum operationsName {
