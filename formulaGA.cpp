@@ -27,7 +27,6 @@ int main() {
 	for (int i = 0; i < parentsCount; i++) {
 		std::cout << parents[i]->results[0].name << " = " << parents[i]->results[0].value << std::endl << std::endl;
 	}
-
 	std::cout << std::endl << "matched: " << std::endl;
 	for (int i = 0; i < parentsCount; i++) {
 		bool m = true;
