@@ -9,11 +9,11 @@ int main() {
 	srand(time(0));
 
 	for (int i = 0; i < parentsCount; i++) {
-		parents[i] = new Member(std::vector<Member*> {new Constant(0), new Constant(0)}, n_plus);
+		parents[i] = new Member(std::vector<Member*> {new Constant(0), new Constant(0)}, 0);
 			//std::cout << parents[i]->perform().name << " = " << parents[i]->perform().value << std::endl;
 	}
 
-	for (int i = 0; i < 1000 && mScore > minScore; i++) {
+	for (int i = 0; i < 1 && mScore > minScore; i++) {
 		std::cout << "step: " << i << std::endl;
 		std::cout << "mutationsCount: " << mutationCount << std::endl;
 		std::cout << "mScore: " << mScore << std::endl;
@@ -37,4 +37,7 @@ int main() {
 		if (m)
 			std::cout << parents[i]->results[0].name << " = " << parents[i]->results[0].value << std::endl << std::endl;
 	}
+
+	while (true)
+		std::cin.get();
 }

@@ -12,7 +12,7 @@ double fitness(Member* m) {
 	for (int i = 0; i < presetsCount; i++) {
 		swapPreset(i);
 		sizeW += -pow(m->size - expectedSize, 6) * sizeInfluence;
-		outW += -pow(expectedResults[nowPreset] - m->results[i].value, 2) * outInfluence;
+		outW += -pow(expectedResults[nowPreset] - m->results[i].value, 6) * outInfluence;
 	}
 	swapPreset(preset);
 	return sizeW + outW;

@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-int const presetsCount = 15;
+int const presetsCount = 12;
 #include "Global.h"
 
 enum operationsName {
@@ -10,7 +10,7 @@ enum operationsName {
 	//n_minus,
 	n_mult,
 	//n_divide,
-	n_sqrt
+	//n_sqrt
 };
 
 //operations
@@ -20,7 +20,7 @@ double minus(double left, double right);
 double mult(double left, double right);
 double divide(double left, double right);
 double sqrt(double left, double right);
-const int operationsCount = 3;
+const int operationsCount = 2;
 
 class Operation {
 public:

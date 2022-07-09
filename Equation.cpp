@@ -9,7 +9,7 @@ std::vector<Operation>operations = {
 	//Operation(" - ", minus),
 	Operation(" * ", mult),
 	//Operation(" / ", divide),
-	Operation(" ^ ", pow),
+	//Operation(" ^ ", pow),
 	//Operation(" sqrt ", sqrt)
 };
 
