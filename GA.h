@@ -5,6 +5,7 @@
 
 #include "Equation.h"
 
+void createPreset();
 void createGeneration();
 void mutate(Member* m);
 Member* randMember(int mSize);
@@ -12,5 +13,6 @@ Member* randMember(int mSize);
 void performGeneration();
 
 void selection();
-double fitness(Member*);
+//long double fitness(Member*);
 
+extern std::vector<void (*)(Member*)> m_funcs;

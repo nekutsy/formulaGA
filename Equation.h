@@ -2,34 +2,50 @@
 
 #include <vector>
 #include <string>
-int const presetsCount = 12;
 #include "Global.h"
 
 enum operationsName {
 	n_plus = 0,
-	//n_minus,
 	n_mult,
-	//n_divide,
-	//n_sqrt
+	n_divide,
+	n_sqrt
 };
 
 //operations
+ /*
 double none(double left, double right);
 double plus(double left, double right);
 double minus(double left, double right);
 double mult(double left, double right);
 double divide(double left, double right);
 double sqrt(double left, double right);
-const int operationsCount = 2;
+*/
 
+namespace operations {
+	Var none(std::vector<Member*>);
+	Var plus(std::vector<Member*>);
+	Var minus(std::vector<Member*>);
+	Var mult(std::vector<Member*>);
+	Var pow(std::vector<Member*>);
+	Var divide(std::vector<Member*>);
+	Var sqrt(std::vector<Member*>);
+	Var abs(std::vector<Member*>);
+	Var sin(std::vector<Member*>);
+	Var cos(std::vector<Member*>);
+	Var tan(std::vector<Member*>);
+	Var mod(std::vector<Member*>);
+}
+extern const int operationsCount;
+class Member;
 class Operation {
 public:
-	Operation(std::string NAME = " EMPTY_OPERATION ", double(*FUNC)(double left, double right) = none);
+	Operation(std::string NAME = " EMPTY_OPERATION ", Var(*FUNC)(std::vector<Member*>) = operations::none, int MAX_MEMBERS = std::numeric_limits<int>::max(), int MIN_MEMBERS = 0);
 	std::string name;
-	double(*func)(double left, double right);
+	Var(*func)(std::vector<Member*>);
+	int maxMembers, minMembers;
 };
 
-extern std::vector<Operation>operations;
+extern const std::vector<Operation>op;
 
 class Var {
 public:
@@ -42,13 +58,14 @@ class Member {
 public:
 	Member(std::vector<Member*> m, int OPERATION = 0);
 	~Member();
+	long double fitness();
 	virtual Var perform();
 	virtual void resize();
 	int operation = 0;
-	std::array<Var, presetsCount> results;
+	std::vector<Var> results;
 
-	int mSize;
-	int size;
+	int mSize, size;
+	double fitn;
 	std::vector<Member*> members;
 protected:
 	Member();
