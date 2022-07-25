@@ -15,6 +15,8 @@ const std::vector<Operation>op = {
 	Operation(" tan ", operations::tan, 1, 1),
 	Operation(" abs ", operations::abs, 1, 1),
 	Operation(" mod ", operations::mod, 2, 2),
+	Operation(" max ", operations::max, 2, 2),
+	Operation(" min ", operations::min, 2, 2),
 };
 const int operationsCount = op.size();
 
@@ -55,7 +57,7 @@ long double Member::fitness() {
 		outW += _outW;
 		nanW += _nanW;
 		if (i != 0)
-			unevenW -= std::pow(preOut - (_outW + nanW), 2) * unevenInfluence;
+			unevenW -= std::abs(preOut - (_outW + nanW)) * unevenInfluence;
 		preOut = _outW + _nanW;
 	}
 	swapPreset(preset);
@@ -123,14 +125,15 @@ Member* getMember(Member* m, int num) {
 	return out;
 }*/
 
-Member* getMember(Member* m, int num) {
+Member* getMember(Member* m, int num, Member*& parent) {
 	if (num == 1 || m->operation == -1)
 		return m;
 	//std::cout << m << std::endl;
 	int nowNum = 0;
 	for (int i = 0; i < m->mSize; i++) {
-		if (num < nowNum + m->members[i]->size)
-			return getMember(m->members[i], num - nowNum);
+		if (num < nowNum + m->members[i]->size) {
+			return getMember(m->members[i], num - nowNum, m);
+		}
 		else
 			nowNum += m->size;
 	}
@@ -256,6 +259,12 @@ Var operations::tan(std::vector<Member*> in) {
 }
 Var operations::mod(std::vector<Member*> in) {
 	return Var(std::fmod(in[0]->results[nowPreset].value, in[1]->results[nowPreset].value), "mod(" + in[0]->results[nowPreset].name + ", " + in[1]->results[nowPreset].name + ")");
+}
+Var operations::max(std::vector<Member*> in) {
+	return Var(std::max(in[0]->results[nowPreset].value, in[1]->results[nowPreset].value), "max(" + in[0]->results[nowPreset].name + ", " + in[1]->results[nowPreset].name + ")");
+}
+Var operations::min(std::vector<Member*> in) {
+	return Var(std::min(in[0]->results[nowPreset].value, in[1]->results[nowPreset].value), "min(" + in[0]->results[nowPreset].name + ", " + in[1]->results[nowPreset].name + ")");
 }
 Operation::Operation(std::string NAME, Var(*FUNC)(std::vector<Member*>), int MAX_MEMBERS, int MIN_MEMBERS) : name(NAME), func(FUNC), maxMembers(MAX_MEMBERS), minMembers(MIN_MEMBERS) {}
 

@@ -34,6 +34,8 @@ namespace operations {
 	Var cos(std::vector<Member*>);
 	Var tan(std::vector<Member*>);
 	Var mod(std::vector<Member*>);
+	Var max(std::vector<Member*>);
+	Var min(std::vector<Member*>);
 }
 extern const int operationsCount;
 class Member;
@@ -81,5 +83,5 @@ public:
 
 int membersCount(Member* p);
 Member* duplicate(Member* m);
-Member* getMember(Member* m, int num);
+Member* getMember(Member* m, int num, Member*&parent);
 void swapPreset(int preset);

@@ -55,11 +55,13 @@ int main() {
 	}
 
 	std::cout << std::endl << "matched: " << std::endl;
+	int numBest = 0;
 	Member* best = parents[0];
 	for (int i = 0; i < parentsCount; i++) {
-		if (parents[i]->fitn > best->fitn)
+		if (parents[i]->fitn > best->fitn) {
 			best = parents[i];
-
+			numBest = i;
+		}
 		bool m = true;
 		for (int j = 0; j < presetsCount; j++)
 			if (parents[i]->results[j].value != expectedResults[j])
@@ -71,7 +73,8 @@ int main() {
 
 	std::cout << "maxFitness:" << std::endl;
 	std::cout << best->results[0].name + " = " << best->results[0].value << std::endl;
-	std::cout << "(" << best->fitn << ")";
+	std::cout << "(" << best->fitn << ")" << std::endl;;
+	std::cout << "num: " << numBest << std::endl;
 
 	const int width = 237;
 	const int height = 67;
@@ -83,7 +86,7 @@ int main() {
 	while (true) {
 		int num = 0;
 		double scale = 0;
-		std::cout << std::endl << std::endl;
+		std::cout << std::endl;
 		std::cout << "num: ";
 		std::cin >> num;
 		std::cout << "scale: ";

@@ -9,7 +9,7 @@ double mScore = 5;
 long double avgFitness = 0;
 long double maxFitness = std::numeric_limits<long double>::lowest();
 std::vector<Var>* members;
-int funcNumber = 3;
+int funcNumber = 2;
 
 std::vector<Var> constants = {
 	Var(1, "1"),
@@ -62,13 +62,7 @@ std::vector<double> expectedResults = { -1, -0.5, 0, 0.5, 1, 1, 1, 0.5, 0, -0.5,
 
 std::vector<double (*)(Var*)> funcs = {
 	[](Var* v) {
-		double out = 0;
-		for (int i = 0; i < varFuncsPresetCount; i++)
-			out += v[i].value;
-		return out;
-	},
-	[](Var* v) {
-		return sin(v->value / 5) * 5;
+		return sin(v->value);
 	},
 	[](Var* v) {
 		return v->value * v->value + sqrt(cos(fmod(v->value, 4)));

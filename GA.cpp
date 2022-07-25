@@ -56,7 +56,13 @@ void createPreset() {
 
 			for (int j = 0; j < varFuncsPresetCount; j++) {
 				std::string name = (j < variables[0].size()) ? variables[0][j].name : ("x" + char(65 + j));
-				v[j] = Var(fmod(double((maxFuncPresetVar - minFuncPresetVar) / funcPresetsCount * i), (maxFuncPresetVar - minFuncPresetVar)) - minFuncPresetVar, name);
+				double x;
+				if (randFuncPresets) {
+					x = fmod(double(rand()) / double(rand()) * double(rand()), maxFuncPresetVar - minFuncPresetVar) - minFuncPresetVar;
+				} else {
+					x = (maxFuncPresetVar - minFuncPresetVar) / double(funcPresetsCount) * double(i) - minFuncPresetVar;
+				} //double((maxFuncPresetVar - minFuncPresetVar) / funcPresetsCount * i), (maxFuncPresetVar - minFuncPresetVar)) - minFuncPresetVar
+				v[j] = Var(x, name);
 				(*presets[i])[constSize + j] = v[j];
 			}
 			expectedResults[i] = funcs[funcNumber](v);
@@ -147,11 +153,24 @@ void selection() {
 }
 
 void mutate(Member* m) {
-	Member* changingM = getMember(m, rand() % m->size);
+	Member* parent = 0;
+	Member* changingM = getMember(m, rand() % m->size, parent);
+	int chMnum = 0;
+	if (parent) {
+		chMnum = rand() % parent->members.size();
+		changingM = parent->members[chMnum];
+	}
 	if (changingM->operation == -1)
-		(dynamic_cast<Constant*>(changingM))->mType = rand() % members->size();
+		if (rand() % 2 || !parent)
+			(dynamic_cast<Constant*>(changingM))->mType = rand() % members->size();
+		else {
+			delete changingM;
+			parent->members.erase(parent->members.begin() + chMnum);
+			parent->members.push_back(randMember(1 + rand() % 5));
+			parent->resize();
+		}
 	else {
-		bool deleteM = changingM->size > 1 && changingM->mSize > op[changingM->operation].minMembers,
+		bool deleteM = changingM->mSize > 1 && changingM->mSize > op[changingM->operation].minMembers,
 			addM = changingM->mSize < op[changingM->operation].maxMembers;
 		int actionType;
 		if ((deleteM || addM) && rand() % 3)
