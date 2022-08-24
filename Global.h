@@ -6,22 +6,22 @@ class Var;
 class Member;
 #include "Equation.h"
 
-const int parentsCount = 100;
-const int generationSize = 1000;
+const int parentsCount = 150;
+const int generationSize = 1500;
 const int maxMemberQuantity = 10;
 const int expectedSize = 1;
 const double sizeInfluence = 0.1;
 const double outInfluence = 1000;
-const double unevenInfluence = 0.01;
+const double unevenInfluence = 0.05;
 const double nanPenalty = -10000000;
 const bool useParents = true;
 
 const bool useFuncPreset = true;
 const bool randFuncPresets = false;
-const int funcPresetsCount = 100;
+const int funcPresetsCount = 200;
 const int varFuncsPresetCount = 1;
-const double minFuncPresetVar = -25;
-const double maxFuncPresetVar = 25;
+const double minFuncPresetVar = -50;
+const double maxFuncPresetVar = 50;
 
 extern int presetsCount;
 extern std::vector<Var> constants;

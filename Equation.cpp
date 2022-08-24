@@ -216,16 +216,6 @@ Var operations::plus(std::vector<Member*> in) {
 	out.name += ")";
 	return out;
 }
-Var operations::minus(std::vector<Member*> in) {
-	Var out(in[0]->results[nowPreset]);
-	out.name = "(" + out.name;
-	for (int i = 1; i < in.size(); i++) {
-		out.name += " - " + in[i]->results[nowPreset].name;
-		out.value -= in[i]->results[nowPreset].value;
-	}
-	out.name += ")";
-	return out;
-}
 Var operations::mult(std::vector<Member*> in) {
 	Var out(in[0]->results[nowPreset]);
 	out.name = "(" + out.name;

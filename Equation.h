@@ -24,7 +24,6 @@ double sqrt(double left, double right);
 namespace operations {
 	Var none(std::vector<Member*>);
 	Var plus(std::vector<Member*>);
-	Var minus(std::vector<Member*>);
 	Var mult(std::vector<Member*>);
 	Var pow(std::vector<Member*>);
 	Var divide(std::vector<Member*>);
