@@ -2,21 +2,27 @@
 
 #include <math.h>
 
-int presetsCount = 7;
+int presetsCount;
 double mutationCount = 10;
 int nowPreset = 0;
 double mScore = 5;
 long double avgFitness = 0;
 long double maxFitness = std::numeric_limits<long double>::lowest();
 std::vector<Var>* members;
-int funcNumber = 4;
+int funcNumber = 6;
 
 std::vector<Var> constants = {
 	Var(1, "1"),
 	Var(-1, "-1"),
 	Var(2, "2"),
 	Var(10, "10"),
-	Var(3.14, "pi"),
+	//Var(3.14, "pi"),
+};
+
+std::vector<std::string> varNames = {
+	"x",
+	"y",
+	"z",
 };
 
 std::vector<std::vector<Var>> variables = {
@@ -60,21 +66,30 @@ std::vector<std::vector<Var>> variables = {
 
 std::vector<double> expectedResults = { -1, -0.5, 0, 0.5, 1, 1, 1, 0.5, 0, -0.5, -1, -1 };
 
-std::vector<double (*)(Var*)> funcs = {
-	[](Var* v) {
-		return sin(v->value / 5) * 5;
+std::vector<double (*)(std::vector<Var>)> funcs = {
+	[](std::vector<Var> v) {
+		return sin(v[0].value / 5) * 5;
 	},
-	[](Var* v) {
-		return v->value * v->value + sqrt(cos(fmod(v->value, 4)));
+	[](std::vector<Var> v) {
+		return v[0].value * v[0].value + sqrt(cos(fmod(v[0].value, 4)));
 	},
-	[](Var* v) {
-		return fmod(v->value * 10, 10 / v->value);
+	[](std::vector<Var> v) {
+		return fmod(v[0].value * 10, 10 / v[0].value);
 	},
-	[](Var* v) {
+	[](std::vector<Var> v) {
 		return double(rand() % 100 - 50);
 	},
-	[](Var* v) {
-		return std::max(sin(v->value), cos(v->value)) * std::max(tan(v->value), atan(v->value));
+	[](std::vector<Var> v) {
+		return std::max(sin(v[0].value), cos(v[0].value)) * std::max(tan(v[0].value), atan(v[0].value));
+	},
+	[](std::vector<Var> v) {
+		return pow(1.075, v[0].value + sin(v[0].value));
+	},
+	[](std::vector<Var> v) {
+		double out = v[0].value;
+		for (int i = 1; i < v.size(); i++)
+			out += v[i].value;
+		return double(7.4354635);
 	},
 };
 

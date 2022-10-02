@@ -41,8 +41,9 @@ std::vector<void (*)(Member*)> m_funcs = {
 	},
 };
 
+/*
 void createPreset() {
-	if (useFuncPreset) {
+	if (generateFuncPreset) {
 		presets.resize(funcPresetsCount);
 		expectedResults.resize(funcPresetsCount);
 		for (int i = 0; i < funcPresetsCount; i++) {
@@ -69,6 +70,56 @@ void createPreset() {
 		}
 		presetsCount = funcPresetsCount;
 	} else {
+		presets.resize(presetsCount);
+		for (int i = 0; i < presetsCount; i++) {
+			int constSize = constants.size(), varSize = variables.size();
+			presets[i] = new std::vector<Var>;
+			presets[i]->resize(constSize + varSize);
+			for (int j = 0; j < constSize; j++)
+				(*presets[i])[j] = constants[j];
+			for (int j = constSize; j < varSize; j++)
+				(*presets[i])[j] = variables[i][j - constSize];
+		}
+	}
+	members = presets[0];
+}*/
+
+void createPreset() {
+	int constSize = constants.size();
+	if (generateFuncPreset) {
+		presetsCount = varFuncsPresetCount * funcPresetsPerVar;
+		presets.resize(presetsCount);
+		expectedResults.resize(presetsCount);
+		for (int i = 0; i < funcPresetsPerVar; i++) {
+			for (int j = 0; j < varFuncsPresetCount; j++) {
+				std::vector<Var>* preset = new std::vector<Var>;
+				preset->resize(constSize + varFuncsPresetCount);
+				for (int k = 0; k < constSize; k++)
+					(*preset)[k] = constants[k];
+
+				for (int k = constSize; k < preset->size(); k++) {
+					std::string name;
+					if (k - constSize >= varNames.size())
+						name = "var" + std::to_string(k - constSize);
+					else
+						name = varNames[k - constSize];
+					(*preset)[k] = Var(minFuncPresetVar + (maxFuncPresetVar - minFuncPresetVar) / funcPresetsPerVar * j, name);
+				}
+				/*std::cout << "func(" << (*preset)[0].name << "(" << (*preset)[0].value << ")";
+				for (int iii = 1; iii < preset->size(); iii++)
+					std::cout << ", " << (*preset)[iii].name << "(" << (*preset)[iii].value << ")";
+				std::cout << ") = " << funcs[funcNumber](*preset) << std::endl;*/
+				presets[i * varFuncsPresetCount + j] = preset;
+
+				std::vector<Var> vec;
+				vec.resize(varFuncsPresetCount);
+				std::copy((*preset).begin() + constSize, (*preset).end(), vec.begin());
+				expectedResults[i * varFuncsPresetCount + j] = funcs[funcNumber](vec);
+			}
+
+		}
+	}
+	else {
 		presets.resize(presetsCount);
 		for (int i = 0; i < presetsCount; i++) {
 			int constSize = constants.size(), varSize = variables.size();

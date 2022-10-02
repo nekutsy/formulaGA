@@ -40,7 +40,7 @@ extern const int operationsCount;
 class Member;
 class Operation {
 public:
-	Operation(std::string NAME = " EMPTY_OPERATION ", Var(*FUNC)(std::vector<Member*>) = operations::none, int MAX_MEMBERS = std::numeric_limits<int>::max(), int MIN_MEMBERS = 0);
+	Operation(std::string NAME, Var(*FUNC)(std::vector<Member*>), int MAX_MEMBERS, int MIN_MEMBERS);
 	std::string name;
 	Var(*func)(std::vector<Member*>);
 	int maxMembers, minMembers;

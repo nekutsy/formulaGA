@@ -106,7 +106,7 @@ int main() {
 				double x = double(j) * scale * scaleX;
 				if (round(results[width / 2 + j] / scale) == round(y / scale))
 					std::cout << ch;
-				else if (round(funcs[funcNumber](new Var(x, "")) / scale) == round(y / scale))
+				else if (round(funcs[funcNumber](std::vector<Var>{Var(x, "")}) / scale) == round(y / scale))
 					std::cout << weakCh;
 				else if (i == 0)
 					std::cout << abscissaCh;
