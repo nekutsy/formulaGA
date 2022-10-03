@@ -9,18 +9,17 @@ class Member;
 const int parentsCount = 100;
 const int generationSize = 500;
 const int maxMemberQuantity = 10;
-const int expectedSize = 2;
-const double sizeInfluence = 0.5;
-const double outInfluence = 100;
+const int expectedSize = 1;
+const double sizeInfluence = 10;
+const double outInfluence = 5;
 const double unevenInfluence = 0.5;
 const double nanPenalty = std::numeric_limits<double>::lowest() / 10;
 const bool useParents = true;
 
 const bool generateFuncPreset = true;
 const bool randFuncPresets = false;
-//const int funcPresetsCount = 200;
 const int funcPresetsPerVar = 50;
-const int varFuncsPresetCount = 3;
+const int varFuncsPresetCount = 4;
 const double minFuncPresetVar = -10;
 const double maxFuncPresetVar = 10;
 

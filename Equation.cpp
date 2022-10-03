@@ -48,13 +48,13 @@ long double Member::fitness() {
 	for (int i = 0; i < presetsCount; i++) {
 		long double out = expectedResults[nowPreset] - results[i].value;
 		swapPreset(i);
-		sizeW += -pow(size - expectedSize, 4) * sizeInfluence;
-		if (results[i].value * 0 != 0)
+		sizeW += -pow(size - expectedSize, 6) * sizeInfluence;
+		if (results[i].value != results[i].value)
 			nanW += 1;
 		else
 			outW += -pow(out, 2) * outInfluence;
 
-		if (i != 0)
+		if (i != 0 && out == out && preOut == preOut)
 			unevenW -= std::abs(preOut - (out)) * unevenInfluence;
 		preOut = out;
 	}

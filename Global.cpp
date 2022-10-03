@@ -20,9 +20,12 @@ std::vector<Var> constants = {
 };
 
 std::vector<std::string> varNames = {
-	"x",
-	"y",
-	"z",
+	"a",
+	"b",
+	"c",
+	"d",
+	"e",
+	"k",
 };
 
 std::vector<std::vector<Var>> variables = {
@@ -86,10 +89,8 @@ std::vector<double (*)(std::vector<Var>)> funcs = {
 		return pow(1.075, v[0].value + sin(v[0].value));
 	},
 	[](std::vector<Var> v) {
-		double out = v[0].value;
-		for (int i = 1; i < v.size(); i++)
-			out += v[i].value;
-		return double(7.4354635);
+		double x = v[0].value, a = v[1].value, b = v[2].value, c = v[3].value;
+		return a * x * x + b * x + c;
 	},
 };
 
