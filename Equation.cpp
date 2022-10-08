@@ -5,18 +5,18 @@
 #include "Global.h"
 
 const std::vector<Operation>op = {
-	Operation(" + ", operations::plus, std::numeric_limits<int>::max(), 1),
-	Operation(" * ", operations::mult, std::numeric_limits<int>::max(), 1),
-	Operation(" / ", operations::divide, 2, 2),
-	Operation(" ^ ", operations::pow, 2, 2),
-	Operation(" sqrt ", operations::sqrt, 1, 1),
-	Operation(" sin ", operations::sin, 1, 1),
-	Operation(" cos ", operations::cos, 1, 1),
-	Operation(" tan ", operations::tan, 1, 1),
-	Operation(" abs ", operations::abs, 1, 1),
-	Operation(" mod ", operations::mod, 2, 2),
-	Operation(" max ", operations::max, 2, 2),
-	Operation(" min ", operations::min, 2, 2),
+	Operation(" + ", operations::plus, operations::names::plus, std::numeric_limits<int>::max(), 1),
+	Operation(" * ", operations::mult, operations::names::mult, std::numeric_limits<int>::max(), 1),
+	Operation(" / ", operations::divide, operations::names::divide, 2, 2),
+	//Operation(" ^ ", operations::pow, operations::names::pow, 2, 2),
+	Operation(" sqrt ", operations::sqrt, operations::names::sqrt, 1, 1),
+	Operation(" sin ", operations::sin, operations::names::sin, 1, 1),
+	Operation(" cos ", operations::cos, operations::names::cos, 1, 1),
+	Operation(" tan ", operations::tan, operations::names::tan, 1, 1),
+	Operation(" abs ", operations::abs, operations::names::abs, 1, 1),
+	Operation(" mod ", operations::mod, operations::names::mod, 2, 2),
+	Operation(" max ", operations::max, operations::names::max, std::numeric_limits<int>::max(), 2),
+	Operation(" min ", operations::min, operations::names::min, std::numeric_limits<int>::max(), 2),
 };
 const int operationsCount = op.size();
 
@@ -44,22 +44,25 @@ Member::~Member() {
 
 long double Member::fitness() {
 	long double sizeW = 0, outW = 0, nanW = 0, unevenW = 0, preOut = 0;
+	sizeW += -pow(size - expectedSize, 2) * sizeInfluence;
 	int preset = nowPreset;
+
 	for (int i = 0; i < presetsCount; i++) {
-		long double out = expectedResults[nowPreset] - results[i].value;
+		long double out = expectedResults[nowPreset] - results[i];
 		swapPreset(i);
-		sizeW += -pow(size - expectedSize, 6) * sizeInfluence;
-		if (results[i].value != results[i].value)
-			nanW += 1;
+		if (results[i] != results[i])
+			if (expectedResults[i] == expectedResults[i])
+				nanW += 1;
 		else
-			outW += -pow(out, 2) * outInfluence;
+			if (expectedResults[i] == expectedResults[i])
+				outW += -pow(out, 2) * outInfluence;
 
 		if (i != 0 && out == out && preOut == preOut)
-			unevenW -= std::abs(preOut - (out)) * unevenInfluence;
+			unevenW -= std::pow(preOut - (out), 2) * unevenInfluence;
 		preOut = out;
 	}
 	swapPreset(preset);
-	fitn = (sizeW + outW + unevenW) / presetsCount + nanW / presetsCount * nanPenalty;
+	fitn = sizeW + (outW + unevenW) / presetsCount + nanW / presetsCount * nanPenalty;
 	return fitn;
 }
 
@@ -82,18 +85,27 @@ Var Member::perform() {
 	return results[nowPreset];
 }*/
 
-Var Member::perform() {
+double Member::perform() {
 	int preset = nowPreset;
 	for (int i = 0; i < mSize; i++)
 		members[i]->perform();
 
 	for (int j = 0; j < presetsCount; j++) {
 		swapPreset(j);
-		Var out = op[operation].func(members);
+		double out = op[operation].func(members);
 		results[j] = out;
 	}
 	swapPreset(preset);
 	return results[nowPreset];
+}
+
+std::string Member::getName() {
+	std::string out;
+	std::vector<std::string> names;
+	names.resize(mSize);
+	for (int i = 0; i < mSize; i++)
+		names[i] = members[i]->getName();
+	return op[operation].getName(names);
 }
 
 Member::Member() { results.resize(presetsCount); }
@@ -150,6 +162,7 @@ Member* duplicate(Member* m) {
 		}
 	}
 	Member* out = new Member(outMembers, m->operation);
+	out->fitn = m->fitn;
 	return out;
 } 
 
@@ -168,8 +181,7 @@ int membersCount(Member* p) {
 
 Constant::Constant(int M_TYPE) : Member(), mType(M_TYPE) {
 	for (int i = 0; i < presetsCount; i++)
-		results[i] = (*presets[i])[mType];
-
+		results[i] = (*presets[i])[mType].value;
 	Member::operation = -1;
 	resize();
 }
@@ -179,10 +191,14 @@ void Constant::resize() {
 	mSize = 1;
 }
 
-Var Constant::perform() {
+double Constant::perform() {
 	for (int i = 0; i < presetsCount; i++)
-		results[i] = (*presets[i])[mType];
+		results[i] = (*presets[i])[mType].value;
 	return results[nowPreset];
+}
+
+std::string Constant::getName() {
+	return g_members[0][mType].name;
 }
 
 /*Member* out;
@@ -203,61 +219,109 @@ double mult(double left, double right) { return left * right; }
 //double divide(double left, double right) { return left / right; }
 double sqrt(double left, double right) { return pow(left, 1 / right); }
 
-Var operations::none(std::vector<Member*> v) { return Var(); }
-Var operations::plus(std::vector<Member*> in) {
-	Var out(in[0]->results[nowPreset]);
-	out.name = "(" + out.name;
-	for (int i = 1; i < in.size(); i++) {
-		out.name += " + " + in[i]->results[nowPreset].name;
-		out.value += in[i]->results[nowPreset].value;
-	}
-	out.name += ")";
+double operations::none(std::vector<Member*> v) { return double(); }
+double operations::plus(std::vector<Member*> in) {
+	double out(in[0]->results[nowPreset]);
+	for (int i = 1; i < in.size(); i++)
+		out += in[i]->results[nowPreset];
 	return out;
 }
-Var operations::mult(std::vector<Member*> in) {
-	Var out(in[0]->results[nowPreset]);
-	out.name = "(" + out.name;
-	for (int i = 1; i < in.size(); i++) {
-		out.name += " * " + in[i]->results[nowPreset].name;
-		out.value *= in[i]->results[nowPreset].value;
-	}
-	out.name += ")";
+double operations::mult(std::vector<Member*> in) {
+	double out(in[0]->results[nowPreset]);
+	for (int i = 1; i < in.size(); i++)
+		out *= in[i]->results[nowPreset];
 	return out;
 }
-Var operations::pow(std::vector<Member*> in) {
-	return Var(std::pow(in[0]->results[nowPreset].value, in[1]->results[nowPreset].value), "(" + in[0]->results[nowPreset].name + ")^(" + in[1]->results[nowPreset].name + ")");
+double operations::pow(std::vector<Member*> in) {
+	return std::pow(in[0]->results[nowPreset], in[1]->results[nowPreset]);
 }
-Var operations::divide(std::vector<Member*> in) {
-	return Var(in[0]->results[nowPreset].value / in[1]->results[nowPreset].value, "(" + in[0]->results[nowPreset].name + " / " + in[1]->results[nowPreset].name + ")");
+double operations::divide(std::vector<Member*> in) {
+	return in[0]->results[nowPreset] / in[1]->results[nowPreset];
 }
-Var operations::sqrt(std::vector<Member*> in) {
-	return Var(std::sqrt(in[0]->results[nowPreset].value), "sqrt(" + in[0]->results[nowPreset].name + ")");
+double operations::sqrt(std::vector<Member*> in) {
+	return std::sqrt(in[0]->results[nowPreset]);
 }
-Var operations::abs(std::vector<Member*> in) {
-	return Var(std::abs(in[0]->results[nowPreset].value), "abs(" + in[0]->results[nowPreset].name + ")");
+double operations::abs(std::vector<Member*> in) {
+	return std::abs(in[0]->results[nowPreset]);
 }
-Var operations::sin(std::vector<Member*> in) {
-	return Var(std::sin(in[0]->results[nowPreset].value), "sin(" + in[0]->results[nowPreset].name + ")");
+double operations::sin(std::vector<Member*> in) {
+	return std::sin(in[0]->results[nowPreset]);
 }
-Var operations::cos(std::vector<Member*> in) {
-	return Var(std::cos(in[0]->results[nowPreset].value), "cos(" + in[0]->results[nowPreset].name + ")");
+double operations::cos(std::vector<Member*> in) {
+	return std::cos(in[0]->results[nowPreset]);
 }
-Var operations::tan(std::vector<Member*> in) {
-	return Var(std::tan(in[0]->results[nowPreset].value), "tan(" + in[0]->results[nowPreset].name + ")");
+double operations::tan(std::vector<Member*> in) {
+	return std::tan(in[0]->results[nowPreset]);
 }
-Var operations::mod(std::vector<Member*> in) {
-	return Var(std::fmod(in[0]->results[nowPreset].value, in[1]->results[nowPreset].value), "mod(" + in[0]->results[nowPreset].name + ", " + in[1]->results[nowPreset].name + ")");
+double operations::mod(std::vector<Member*> in) {
+	return std::fmod(in[0]->results[nowPreset], in[1]->results[nowPreset]);
 }
-Var operations::max(std::vector<Member*> in) {
-	return Var(std::max(in[0]->results[nowPreset].value, in[1]->results[nowPreset].value), "max(" + in[0]->results[nowPreset].name + ", " + in[1]->results[nowPreset].name + ")");
+double operations::max(std::vector<Member*> in) {
+	long double out = in[0]->results[nowPreset];
+	for (int i = 1; i < in.size(); i++)
+		out = std::max(out, in[i]->results[nowPreset]);
+	return out;
 }
-Var operations::min(std::vector<Member*> in) {
-	return Var(std::min(in[0]->results[nowPreset].value, in[1]->results[nowPreset].value), "min(" + in[0]->results[nowPreset].name + ", " + in[1]->results[nowPreset].name + ")");
+double operations::min(std::vector<Member*> in) {
+	long double out = in[0]->results[nowPreset];
+	for (int i = 1; i < in.size(); i++)
+		out = std::min(out, in[i]->results[nowPreset]);
+	return out;
 }
 
-Operation::Operation(std::string NAME = "_EMPTRY_OPERATION_", Var(*FUNC)(std::vector<Member*>) = operations::none, int MAX_MEMBERS = std::numeric_limits<int>::max(), int MIN_MEMBERS = 0) : name(NAME), func(FUNC), maxMembers(MAX_MEMBERS), minMembers(MIN_MEMBERS) {}
+std::string operations::names::none(std::vector<std::string> v) { return "NONE"; }
+std::string operations::names::plus(std::vector<std::string> in) {
+	std::string out = "(" + in[0];
+	for (int i = 1; i < in.size(); i++)
+		out += " + " + in[i];
+	return out + ")";
+}
+std::string operations::names::mult(std::vector<std::string> in) {
+	std::string out = "(" + in[0];
+	for (int i = 1; i < in.size(); i++)
+		out += " * " + in[i];
+	return out + ")";
+}
+std::string operations::names::pow(std::vector<std::string> in) {
+	return "(" + in[0] + ")^(" + in[1] + ")";
+}
+std::string operations::names::divide(std::vector<std::string> in) {
+	return "(" + in[0] + " / " + in[1] + ")";
+}
+std::string operations::names::sqrt(std::vector<std::string> in) {
+	return "sqrt(" + in[0] + ")";
+}
+std::string operations::names::abs(std::vector<std::string> in) {
+	return "abs(" + in[0] + ")";
+}
+std::string operations::names::sin(std::vector<std::string> in) {
+	return "sin(" + in[0] + ")";
+}
+std::string operations::names::cos(std::vector<std::string> in) {
+	return "cos(" + in[0] + ")";
+}
+std::string operations::names::tan(std::vector<std::string> in) {
+	return "tan(" + in[0] + ")";
+}
+std::string operations::names::mod(std::vector<std::string> in) {
+	return "mod(" + in[0] + ", " + in[1] + ")";
+}
+std::string operations::names::max(std::vector<std::string> in) {
+	std::string out = "max(" + in[0];
+	for (int i = 1; i < in.size(); i++)
+		out += ", " + in[i];
+	return out + ")";
+}
+std::string operations::names::min(std::vector<std::string> in) {
+	std::string out = "min(" + in[0];
+	for (int i = 1; i < in.size(); i++)
+		out += ", " + in[i];
+	return out + ")";
+}
+
+Operation::Operation(std::string NAME = "_EMPTRY_OPERATION_", double(*FUNC)(std::vector<Member*>) = operations::none, std::string(*GET_NAME)(std::vector<std::string>) = operations::names::none, int MAX_MEMBERS = std::numeric_limits<int>::max(), int MIN_MEMBERS = 0) : name(NAME), func(FUNC), getName(GET_NAME), maxMembers(MAX_MEMBERS), minMembers(MIN_MEMBERS) {}
 
 void swapPreset(int preset) {
 	nowPreset = preset;
-	members = presets[preset];
+	g_members = presets[preset];
 }

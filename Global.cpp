@@ -8,15 +8,16 @@ int nowPreset = 0;
 double mScore = 5;
 long double avgFitness = 0;
 long double maxFitness = std::numeric_limits<long double>::lowest();
-std::vector<Var>* members;
-int funcNumber = 6;
+Member* maxFitnM = 0;
+std::vector<Var>* g_members;
+int funcNumber = 7;
 
 std::vector<Var> constants = {
 	Var(1, "1"),
 	Var(-1, "-1"),
 	Var(2, "2"),
 	Var(10, "10"),
-	//Var(3.14, "pi"),
+	Var(3.14, "pi"),
 };
 
 std::vector<std::string> varNames = {
@@ -67,30 +68,38 @@ std::vector<std::vector<Var>> variables = {
 	},
 };
 
-std::vector<double> expectedResults = { -1, -0.5, 0, 0.5, 1, 1, 1, 0.5, 0, -0.5, -1, -1 };
+std::vector<long double> expectedResults = { -1, -0.5, 0, 0.5, 1, 1, 1, 0.5, 0, -0.5, -1, -1 };
 
 std::vector<double (*)(std::vector<Var>)> funcs = {
-	[](std::vector<Var> v) {
-		return sin(v[0].value / 5) * 5;
+	[](std::vector<Var> v) { // 0
+		return sin(v[0].value / 15) * 15;
 	},
-	[](std::vector<Var> v) {
-		return v[0].value * v[0].value + sqrt(cos(fmod(v[0].value, 4)));
+	[](std::vector<Var> v) { // 1
+		return v[0].value * v[0].value + sqrt(abs(cos(fmod(v[0].value, 4))));
 	},
-	[](std::vector<Var> v) {
+	[](std::vector<Var> v) { // 2
 		return fmod(v[0].value * 10, 10 / v[0].value);
 	},
-	[](std::vector<Var> v) {
+	[](std::vector<Var> v) { // 3
 		return double(rand() % 100 - 50);
 	},
-	[](std::vector<Var> v) {
+	[](std::vector<Var> v) { // 4
 		return std::max(sin(v[0].value), cos(v[0].value)) * std::max(tan(v[0].value), atan(v[0].value));
 	},
-	[](std::vector<Var> v) {
-		return pow(1.075, v[0].value + sin(v[0].value));
+	[](std::vector<Var> v) { // 5
+		return pow(1.075, v[0].value + sin(v[0].value) * 5);
 	},
-	[](std::vector<Var> v) {
+	[](std::vector<Var> v) { // 6
 		double x = v[0].value, a = v[1].value, b = v[2].value, c = v[3].value;
 		return a * x * x + b * x + c;
+	},
+	[](std::vector<Var> v) { // 7
+		double x = v[0].value;
+		return 0.05 * x * x - 0.5 * x - 5;
+	},
+	[](std::vector<Var> v) { // 8
+		double v0 = v[0].value, t = v[1].value, a = v[2].value;
+		return v0*t+a*t*t/2;
 	},
 };
 

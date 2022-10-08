@@ -11,7 +11,7 @@ std::vector<void (*)(Member*)> m_funcs = {
 		if (rand() % 2)
 			m->members.push_back(randMember(2 + rand() % 4));
 		else
-			m->members.push_back(new Constant(rand() % members->size()));
+			m->members.push_back(new Constant(rand() % g_members->size()));
 		m->resize();
 	},[](Member* m) { // delete member
 		int dm = rand() % m->mSize;
@@ -103,7 +103,7 @@ void createPreset() {
 						name = "var" + std::to_string(k - constSize);
 					else
 						name = varNames[k - constSize];
-					(*preset)[k] = Var(minFuncPresetVar + (maxFuncPresetVar - minFuncPresetVar) / funcPresetsPerVar * j, name);
+					(*preset)[k] = Var(minFuncPresetVar + (maxFuncPresetVar - minFuncPresetVar) / funcPresetsPerVar * i, name);
 				}
 				/*std::cout << "func(" << (*preset)[0].name << "(" << (*preset)[0].value << ")";
 				for (int iii = 1; iii < preset->size(); iii++)
@@ -131,7 +131,7 @@ void createPreset() {
 				(*presets[i])[j] = variables[i][j - constSize];
 		}
 	}
-	members = presets[0];
+	g_members = presets[0];
 }
 
 void createGeneration() {
@@ -146,12 +146,16 @@ void createGeneration() {
 	}
 }
 
-Member* randMember(int mSize) {
+Member* randMember(int mSize, int maxDeep) {
 	int operation = rand() % operationsCount, size = std::max(std::min(mSize, op[operation].maxMembers), op[operation].minMembers);
 	std::vector<Member*> constants;
 	constants.resize(size);
 	for (int i = 0; i < size; i++)
-		constants[i] = new Constant(rand() % members->size());
+		if (maxDeep > 1 && rand() % 2)
+			constants[i] = randMember(mSize, maxDeep - 1);
+		else
+			constants[i] = new Constant(rand() % g_members->size());
+
 	return new Member(constants, operation);
 }
 
@@ -170,27 +174,34 @@ void selection() {
 			parents[i] = duplicate(generation[i]);
 		}
 
-	long double preMaxFitness = maxFitness;
 	for (int i = 0; i < generationSize; i++) {
 		long double fitn = generation[i]->fitn;
-		maxFitness = std::max(fitn, maxFitness);
 		for (int j = 0; j < parentsCount; j++) {
 			if (fitn > parents[j]->fitn) {
-				bool repeated = false;
-				for (int k = 0; k < parentsCount && !repeated; k++) {
-					bool match = true;
-					for (int l = 0; l < presetsCount; l++)
-						match &= (generation[i]->results[l].value == parents[k]->results[l].value);
-					repeated = (generation[i]->results[0].name == parents[k]->results[0].name) || match;
+				bool unique = true;
+				for (int k = 0; k < parentsCount && unique; k++) {
+					bool identity = true;
+					bool improv = true;
+					for (int l = 0; l < presetsCount && (identity || improv); l++) {
+						if (generation[i]->results[l] != parents[k]->results[l])
+							identity = false;
+						if (fitn <= parents[k]->fitn)
+							improv = false;
+					}
+					unique = !identity || improv;
 				}
-				if (!repeated) {
+				if (unique) {
 					parents[j]->~Member();
 					delete parents[j];
 					parents[j] = generation[i];
 					generation[i] = 0;
-					break;
 				}
+				break;
 			}
+		}
+		if (fitn > maxFitness) {
+			maxFitness = fitn;
+			//std::cout << generation[i] << std::endl;
 		}
 		if (generation[i]) {
 			generation[i]->~Member();
@@ -199,7 +210,7 @@ void selection() {
 	}
 	avgFitness = 0;
 	for (int i = 0; i < parentsCount; i++)
-		avgFitness += parents[i]->fitness();
+		avgFitness += parents[i]->fitn;
 	avgFitness /= parentsCount;
 }
 
@@ -213,7 +224,7 @@ void mutate(Member* m) {
 	}
 	if (changingM->operation == -1)
 		if (rand() % 2 || !parent)
-			(dynamic_cast<Constant*>(changingM))->mType = rand() % members->size();
+			(dynamic_cast<Constant*>(changingM))->mType = rand() % g_members->size();
 		else {
 			delete changingM;
 			parent->members.erase(parent->members.begin() + chMnum);

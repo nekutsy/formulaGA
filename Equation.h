@@ -22,27 +22,44 @@ double sqrt(double left, double right);
 */
 
 namespace operations {
-	Var none(std::vector<Member*>);
-	Var plus(std::vector<Member*>);
-	Var mult(std::vector<Member*>);
-	Var pow(std::vector<Member*>);
-	Var divide(std::vector<Member*>);
-	Var sqrt(std::vector<Member*>);
-	Var abs(std::vector<Member*>);
-	Var sin(std::vector<Member*>);
-	Var cos(std::vector<Member*>);
-	Var tan(std::vector<Member*>);
-	Var mod(std::vector<Member*>);
-	Var max(std::vector<Member*>);
-	Var min(std::vector<Member*>);
+	double none(std::vector<Member*>);
+	double plus(std::vector<Member*>);
+	double mult(std::vector<Member*>);
+	double pow(std::vector<Member*>);
+	double divide(std::vector<Member*>);
+	double sqrt(std::vector<Member*>);
+	double abs(std::vector<Member*>);
+	double sin(std::vector<Member*>);
+	double cos(std::vector<Member*>);
+	double tan(std::vector<Member*>);
+	double mod(std::vector<Member*>);
+	double max(std::vector<Member*>);
+	double min(std::vector<Member*>);
+	
+	namespace names {
+		std::string none(std::vector<std::string>);
+		std::string plus(std::vector<std::string>);
+		std::string mult(std::vector<std::string>);
+		std::string pow(std::vector<std::string>);
+		std::string divide(std::vector<std::string>);
+		std::string sqrt(std::vector<std::string>);
+		std::string abs(std::vector<std::string>);
+		std::string sin(std::vector<std::string>);
+		std::string cos(std::vector<std::string>);
+		std::string tan(std::vector<std::string>);
+		std::string mod(std::vector<std::string>);
+		std::string max(std::vector<std::string>);
+		std::string min(std::vector<std::string>);
+	}
 }
 extern const int operationsCount;
 class Member;
 class Operation {
 public:
-	Operation(std::string NAME, Var(*FUNC)(std::vector<Member*>), int MAX_MEMBERS, int MIN_MEMBERS);
+	Operation(std::string NAME, double(*FUNC)(std::vector<Member*>), std::string(*GET_NAME)(std::vector<std::string>), int MAX_MEMBERS, int MIN_MEMBERS);
 	std::string name;
-	Var(*func)(std::vector<Member*>);
+	double(*func)(std::vector<Member*>);
+	std::string(*getName)(std::vector<std::string>);
 	int maxMembers, minMembers;
 };
 
@@ -60,13 +77,14 @@ public:
 	Member(std::vector<Member*> m, int OPERATION = 0);
 	~Member();
 	long double fitness();
-	virtual Var perform();
+	virtual double perform();
+	virtual std::string getName();
 	virtual void resize();
 	int operation = 0;
-	std::vector<Var> results;
+	std::vector<long double> results;
 
 	int mSize, size;
-	double fitn;
+	long double fitn;
 	std::vector<Member*> members;
 protected:
 	Member();
@@ -75,7 +93,8 @@ protected:
 class Constant : public Member {
 public:
 	Constant(int mNum);
-	virtual Var perform();
+	virtual double perform();
+	virtual std::string getName();
 	virtual void resize();
 	int mType;
 };

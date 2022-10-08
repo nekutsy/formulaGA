@@ -6,19 +6,23 @@
 #include "GA.h"
 #include "Global.h"
 
+void display(int num, double scale, int width = 237, int height = 60, int offsetX = 0, int offsetY = 0);
+void displayInfo(bool detail = false);
+
 int main() {
 	srand(time(0));
 	createPreset();
 	for (int i = 0; i < parentsCount; i++) {
-		parents[i] = randMember(1 + rand() % 5);
-		std::cout << parents[i]->perform().name + " = " << parents[i]->perform().value << std::endl;
+		parents[i] = randMember(1 + rand() % 5, 2);
+		maxFitness = std::max(maxFitness, parents[i]->fitness());
+		//std::cout << parents[i]->getName() + " = " << parents[i]->perform() << std::endl;
 	}
-	std::cout << std::endl;
+	//std::cout << std::endl;
 
 	bool isRun = true, showInfo;
 	int stepCount = 0;
 	long double preMax;
-	while (isRun) {
+	while (true) {
 		char ch;
 		preMax = maxFitness;
 		std::cout << "showInfo(y/n): ";
@@ -37,20 +41,97 @@ int main() {
 			performGeneration();
 			selection();
 		}
-		std::cout << "improve = " << maxFitness - preMax << std::endl;
-		std::cout << "maxFitness = " << maxFitness << std::endl;
+		std::cout << "improve: " << maxFitness - preMax << std::endl;
+		std::cout << "maxFitness: " << maxFitness << std::endl;
+		Member* b = parents[0];
+		for (int i = 0; i < parentsCount; i++)
+			if (parents[i]->fitn > b->fitn)
+				b = parents[i];
+		std::cout << "best: " << b->getName() << " = y" << std::endl;
+
 		std::cout << std::endl;
 		std::cout << "continue(y/n): ";
 		std::cin >> ch;
-		isRun = ch == 'y';
+		if (ch != 'y') {
+			displayInfo(true);
+			std::cout << std::endl << "for continue enter -1" << std::endl;
+			int num;
+			double scale;
+			bool isStopped = true;
+			while (isStopped) {
+				do {
+					std::cout << "num: ";
+					std::cin >> num;
+				} while (num < -1 || num >= parentsCount);
+				if (num == -1)
+					break;
+				std::cout << "scale: ";
+				std::cin >> scale;
+				std::cout << parents[num]->getName() << " = y" << std::endl;
+				display(num, scale);
+			}
+			std::cout << std::endl;
+		}
 	}
+	std::cout << "watafak???";
+}
+
+const double scaleX = 0.5;
+const char emptyCh = ' ', ch = '#', weakCh = '.',
+abscissaCh = '-', ordinateCh = '|';
+
+void display(int num, double scale, int width, int height, int offsetX, int offsetY) {
+	double* results = new double[width];
+	std::cout << std::endl;
+	offsetX *= scale;
+	offsetY *= scale;
+	scale = 1 / scale;
+	Member* m = parents[num];
+	//std::cout << m->getName() + " = y" << std::endl;
+
+	double preX = (*presets[0])[constants.size()].value;
+	for (int i = -width / 2; i < width / 2; i++) {
+		double x = double(i + offsetX) * scale * scaleX;
+		(*presets[0])[constants.size()].value = x;
+		results[width / 2 + i] = m->perform();
+	}
+	for (int i = -height / 2; i < height / 2; i++) {
+		double y = -double(i + offsetY) * scale;
+		for (int j = -width / 2; j < width / 2; j++) {
+			double x = double(j + offsetX) * scale * scaleX;
+			if (round(results[width / 2 + j] / scale) == round(y / scale))
+				std::cout << ch;
+			else if (round(funcs[funcNumber](std::vector<Var>{Var(x, "")}) / scale) == round(y / scale))
+				std::cout << weakCh;
+			else if (i + offsetY == 0)
+				std::cout << abscissaCh;
+			else if (j + offsetX == 0)
+				std::cout << ordinateCh;
+			else
+				std::cout << emptyCh;
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+	delete[] results;
+	(*presets[0])[constants.size()].value = preX;
+
+}
+
+const int miniWidth = 20, miniHight = 10;
+void displayInfo(bool detail) {
 	std::cout << std::endl << "best: " << std::endl;
 	swapPreset(0);
 	for (int i = 0; i < parentsCount; i++) {
 		std::cout << "num: " << i << std::endl;
-		std::cout << parents[i]->results[0].name + " = " << parents[i]->results[0].value << std::endl;
+		std::cout << parents[i]->getName() + " = y" << std::endl;
 		std::cout << "fitness: " << parents[i]->fitn << std::endl;
-		std::cout << "size: " << parents[i]->size << std::endl;
+		//std::cout << "size: " << parents[i]->size << std::endl;
+		if (detail) {
+			float scale = miniWidth / std::abs(maxFuncPresetVar - minFuncPresetVar);
+			int offset = (minFuncPresetVar + maxFuncPresetVar) / 2.f;
+			display(i, scale, 16, 8, offset);
+		}
 		std::cout << std::endl;
 	}
 
@@ -64,60 +145,14 @@ int main() {
 		}
 		bool m = true;
 		for (int j = 0; j < presetsCount; j++)
-			if (parents[i]->results[j].value != expectedResults[j])
+			if (parents[i]->results[j] != expectedResults[j])
 				m = false;
-		if (m)
-			std::cout << parents[i]->results[0].name + " = " << parents[i]->results[0].value << std::endl << std::endl;
 	}
 	std::cout << std::endl;
 
 	std::cout << "maxFitness:" << std::endl;
-	std::cout << best->results[0].name + " = " << best->results[0].value << std::endl;
-	std::cout << "(" << best->fitn << ")" << std::endl;;
 	std::cout << "num: " << numBest << std::endl;
+	std::cout << best->getName() + " = y" << std::endl;
+	std::cout << "(" << best->fitn << ")" << std::endl;;
 
-	const int width = 237;
-	const int height = 67;
-	double *results = new double[width];
-	const double scaleX = 0.5;
-	const char emptyCh = ' ', ch = '#', weakCh = '.',
-		abscissaCh = '-', ordinateCh = '|';
-	swapPreset(0);
-	while (true) {
-		int num = 0;
-		double scale = 0;
-		std::cout << std::endl;
-		std::cout << "num: ";
-		std::cin >> num;
-		std::cout << "scale: ";
-		std::cin >> scale;
-		scale = 1 / scale;
-		Member* m = parents[num];
-		std::cout << m->results[0].name + " = y" << std::endl;
-
-		for (int i = -width / 2; i < width / 2; i++) {
-			double x = double(i) * scale * scaleX;
-			(*presets[0])[constants.size()].value = x;
-			results[width / 2 + i] = m->perform().value;
-		}
-		for (int i = -height / 2; i < height / 2; i++) {
-			double y = -double(i) * scale;
-			for (int j = -width / 2; j < width / 2; j++) {
-				double x = double(j) * scale * scaleX;
-				if (round(results[width / 2 + j] / scale) == round(y / scale))
-					std::cout << ch;
-				else if (round(funcs[funcNumber](std::vector<Var>{Var(x, "")}) / scale) == round(y / scale))
-					std::cout << weakCh;
-				else if (i == 0)
-					std::cout << abscissaCh;
-				else if (j == 0)
-					std::cout << ordinateCh;
-				else
-					std::cout << emptyCh;
-			}
-			std::cout << std::endl;
-		}
-		std::cout << std::endl;
-	}
-	std::cout << "watafak???";
 }

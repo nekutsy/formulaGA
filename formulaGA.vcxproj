@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Equation.h" />
+    <ClInclude Include="formulaGA.h" />
     <ClInclude Include="GA.h" />
     <ClInclude Include="Global.h" />
   </ItemGroup>

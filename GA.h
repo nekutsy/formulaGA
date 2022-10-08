@@ -8,7 +8,7 @@
 void createPreset();
 void createGeneration();
 void mutate(Member* m);
-Member* randMember(int mSize);
+Member* randMember(int mSize, int maxDeep = 1);
 
 void performGeneration();
 
