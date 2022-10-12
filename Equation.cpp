@@ -54,7 +54,7 @@ long double Member::fitness() {
 			if (expectedResults[i] == expectedResults[i])
 				nanW += 1;
 		else
-			if (expectedResults[i] == expectedResults[i])
+			if (out == out)
 				outW += -pow(out, 2) * outInfluence;
 
 		if (i != 0 && out == out && preOut == preOut)

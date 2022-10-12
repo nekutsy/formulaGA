@@ -146,8 +146,9 @@ void createGeneration() {
 	}
 }
 
-Member* randMember(int mSize, int maxDeep) {
-	int operation = rand() % operationsCount, size = std::max(std::min(mSize, op[operation].maxMembers), op[operation].minMembers);
+Member* randMember(int mSize, int maxDeep, int opType) {
+	int operation = (opType == -1) ? (rand() % operationsCount) : opType,
+		size = std::max(std::min(mSize, op[operation].maxMembers), op[operation].minMembers);
 	std::vector<Member*> constants;
 	constants.resize(size);
 	for (int i = 0; i < size; i++)

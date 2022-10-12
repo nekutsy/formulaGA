@@ -128,7 +128,7 @@ void displayInfo(bool detail) {
 		std::cout << "fitness: " << parents[i]->fitn << std::endl;
 		//std::cout << "size: " << parents[i]->size << std::endl;
 		if (detail) {
-			float scale = miniWidth / std::abs(maxFuncPresetVar - minFuncPresetVar);
+			float scale = float(miniWidth) / std::abs(maxFuncPresetVar - minFuncPresetVar);
 			int offset = (minFuncPresetVar + maxFuncPresetVar) / 2.f;
 			display(i, scale, 16, 8, offset);
 		}

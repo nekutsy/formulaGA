@@ -7,21 +7,21 @@ class Member;
 #include "Equation.h"
 
 const int parentsCount = 50;
-const int generationSize = 700;
+const int generationSize = 500;
 const int maxMemberQuantity = 10;
 const int expectedSize = 3;
-const double sizeInfluence = 0.5;
-const double outInfluence = 15;
+const double sizeInfluence = 0.001;
+const double outInfluence = 10;
 const double unevenInfluence = 30;
 const double nanPenalty = std::numeric_limits<double>::lowest() / 10;
 const bool useParents = true;
 
 const bool generateFuncPreset = true;
 const bool randFuncPresets = false;
-const int funcPresetsPerVar = 150;
+const int funcPresetsPerVar = 200;
 const int varFuncsPresetCount = 1;
-const double minFuncPresetVar = -10;
-const double maxFuncPresetVar = 100;
+const double minFuncPresetVar = 0;
+const double maxFuncPresetVar = 50;
 
 extern int presetsCount;
 extern std::vector<Var> constants;

@@ -10,14 +10,14 @@ long double avgFitness = 0;
 long double maxFitness = std::numeric_limits<long double>::lowest();
 Member* maxFitnM = 0;
 std::vector<Var>* g_members;
-int funcNumber = 7;
+int funcNumber = 9;
 
 std::vector<Var> constants = {
 	Var(1, "1"),
 	Var(-1, "-1"),
 	Var(2, "2"),
 	Var(10, "10"),
-	Var(3.14, "pi"),
+	Var(3.14159265359, "pi"),
 };
 
 std::vector<std::string> varNames = {
@@ -72,7 +72,7 @@ std::vector<long double> expectedResults = { -1, -0.5, 0, 0.5, 1, 1, 1, 0.5, 0, 
 
 std::vector<double (*)(std::vector<Var>)> funcs = {
 	[](std::vector<Var> v) { // 0
-		return sin(v[0].value / 15) * 15;
+		return cos(v[0].value / 15) * 15 - 5;
 	},
 	[](std::vector<Var> v) { // 1
 		return v[0].value * v[0].value + sqrt(abs(cos(fmod(v[0].value, 4))));
@@ -100,6 +100,22 @@ std::vector<double (*)(std::vector<Var>)> funcs = {
 	[](std::vector<Var> v) { // 8
 		double v0 = v[0].value, t = v[1].value, a = v[2].value;
 		return v0*t+a*t*t/2;
+	},
+	[](std::vector<Var> v) { // 9
+		double x = v[0].value;
+		return fmod(10 * x, x * x);
+	},
+	[](std::vector<Var> v) { // 10
+		int n = std::max(int(v[0].value), 0);
+
+		int* a = new int[std::max(n + 1, 3)];
+		a[0] = 1;
+		a[1] = 1;
+		for (int i = 2; i < n + 1; i++)
+			a[i] = a[i - 1] + a[i - 2];
+		double out = a[n];
+		delete[] a;
+		return out;
 	},
 };
 
