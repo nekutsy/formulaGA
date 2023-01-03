@@ -88,6 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -102,6 +103,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,16 +141,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseGA.cpp" />
     <ClCompile Include="Equation.cpp" />
     <ClCompile Include="formulaGA.cpp" />
     <ClCompile Include="GA.cpp" />
     <ClCompile Include="Global.cpp" />
+    <ClCompile Include="PingPongSelection.cpp" />
+    <ClCompile Include="UseFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseGA.h" />
     <ClInclude Include="Equation.h" />
     <ClInclude Include="formulaGA.h" />
     <ClInclude Include="GA.h" />
     <ClInclude Include="Global.h" />
+    <ClInclude Include="PingPongSelection.h" />
+    <ClInclude Include="UseFunctions.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
