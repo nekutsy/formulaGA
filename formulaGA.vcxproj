@@ -147,6 +147,7 @@
     <ClCompile Include="GA.cpp" />
     <ClCompile Include="Global.cpp" />
     <ClCompile Include="PingPongSelection.cpp" />
+    <ClCompile Include="UseCSV.cpp" />
     <ClCompile Include="UseFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +157,7 @@
     <ClInclude Include="GA.h" />
     <ClInclude Include="Global.h" />
     <ClInclude Include="PingPongSelection.h" />
+    <ClInclude Include="UseCSV.h" />
     <ClInclude Include="UseFunctions.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

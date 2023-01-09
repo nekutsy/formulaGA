@@ -13,29 +13,29 @@ enum operationsName {
 
 //operations
  /*
-double none(double left, double right);
-double plus(double left, double right);
-double minus(double left, double right);
-double mult(double left, double right);
-double divide(double left, double right);
-double sqrt(double left, double right);
+float none(float left, float right);
+float plus(float left, float right);
+float minus(float left, float right);
+float mult(float left, float right);
+float divide(float left, float right);
+float sqrt(float left, float right);
 */
 
 namespace operations {
-	double none(std::vector<Member*>&, int);
-	double sum(std::vector<Member*>&, int);
-	double dif(std::vector<Member*>&, int);
-	double mult(std::vector<Member*>&, int);
-	double pow(std::vector<Member*>&, int);
-	double div(std::vector<Member*>&, int);
-	double sqrt(std::vector<Member*>&, int);
-	double abs(std::vector<Member*>&, int);
-	double sin(std::vector<Member*>&, int);
-	double cos(std::vector<Member*>&, int);
-	double tan(std::vector<Member*>&, int);
-	double mod(std::vector<Member*>&, int);
-	double max(std::vector<Member*>&, int);
-	double min(std::vector<Member*>&, int);
+	float none(std::vector<Member*>&, int);
+	float sum(std::vector<Member*>&, int);
+	float dif(std::vector<Member*>&, int);
+	float mult(std::vector<Member*>&, int);
+	float pow(std::vector<Member*>&, int);
+	float div(std::vector<Member*>&, int);
+	float sqrt(std::vector<Member*>&, int);
+	float abs(std::vector<Member*>&, int);
+	float sin(std::vector<Member*>&, int);
+	float cos(std::vector<Member*>&, int);
+	float tan(std::vector<Member*>&, int);
+	float mod(std::vector<Member*>&, int);
+	float max(std::vector<Member*>&, int);
+	float min(std::vector<Member*>&, int);
 	
 	namespace names {
 		std::string none(std::vector<std::string>);
@@ -58,9 +58,9 @@ extern const int operationsCount;
 class Member;
 class Operation {
 public:
-	Operation(std::string NAME, double(*FUNC)(std::vector<Member*>&, int), std::string(*GET_NAME)(std::vector<std::string>), int MAX_MEMBERS, int MIN_MEMBERS);
+	Operation(std::string NAME, float(*FUNC)(std::vector<Member*>&, int), std::string(*GET_NAME)(std::vector<std::string>), int MAX_MEMBERS, int MIN_MEMBERS);
 	std::string name;
-	double(*func)(std::vector<Member*>&, int);
+	float(*func)(std::vector<Member*>&, int);
 	std::string(*getName)(std::vector<std::string>);
 	int maxMembers, minMembers;
 };
@@ -69,18 +69,19 @@ extern const std::vector<Operation>op;
 
 class Member {
 public:
-	virtual double fitness() = 0;
+	virtual float fitness() = 0;
 	virtual void perform() = 0;
-	virtual double perform(std::vector<double> vars) = 0;
+	virtual float perform(std::vector<float> vars) = 0;
 	virtual std::string getName() = 0;
-	virtual double getResult(int i) = 0;
+	virtual float getResult(int i) = 0;
 	virtual Member* getMember(int i) = 0;
 	virtual void resize() = 0;
+	virtual bool operator==(Member& right) = 0;
 
 	int mSize, size;
 	int operation = 0;
 	int nowPreset = 0;
-	double fitn = std::numeric_limits<double>::lowest();
+	float fitn = std::numeric_limits<float>::lowest();
 	virtual ~Member();
 protected:
 	Member(int OPERATION = 0);
@@ -89,29 +90,31 @@ protected:
 class Const : public Member {
 public:
 	Const(int mNum);
-	virtual double fitness();
+	virtual float fitness();
 	virtual void perform();
-	virtual double perform(std::vector<double> vars);
+	virtual float perform(std::vector<float> vars);
 	virtual std::string getName();
-	virtual double getResult(int i);
+	virtual float getResult(int i);
 	virtual Member* getMember(int i);
 	virtual void resize();
+	virtual bool operator==(Member& right);
 	int mType;
 };
 
 class Var : public Member {
 public:
 	Var(int mNum);
-	virtual double fitness();
+	virtual float fitness();
 	virtual void perform();
-	virtual double perform(std::vector<double> vars);
+	virtual float perform(std::vector<float> vars);
 	virtual std::string getName();
-	virtual double getResult(int i);
+	virtual float getResult(int i);
 	virtual Member* getMember(int i);
 	virtual void resize();
+	virtual bool operator==(Member& right);
 	int mType;
 private:
-	double result;
+	float result;
 };
 
 class Expression : public Member {
@@ -120,16 +123,17 @@ public:
 	Expression(std::string s);
 	virtual ~Expression();
 
-	virtual double fitness();
+	virtual float fitness();
 	virtual void perform();
-	virtual double perform(std::vector<double> vars);
+	virtual float perform(std::vector<float> vars);
 	virtual std::string getName();
-	virtual double getResult(int i);
+	virtual float getResult(int i);
 	virtual Member* getMember(int i);
 	virtual void resize();
+	virtual bool operator==(Member& right);
 
 	std::vector<Member*> members;
-	std::vector<double> results;
+	std::vector<float> results;
 };
 
 int membersCount(Member* p);

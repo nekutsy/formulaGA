@@ -3,21 +3,25 @@
 #include "Equation.h"
 #include "BaseGA.h"
 
-const float mWidth = 60;
-const float mHeight = 15;
-const float pMaxSpeed = 2;
-const float pAcceleration = 1;
-const float pDeceleration = 0.75;
-const float maxSpeed = 1.5;
-const float durationLimit = 235;
+extern float mWidth;
+extern float mHeight;
+extern float pMaxSpeed;
+extern float pAcceleration;
+extern float pDeceleration;
+extern float maxSpeed;
+extern float durationLimit;
+extern int limitOfMisses;
+extern float difficult;
 //bool draw = false;
 
-int p_pingpong(Expression* m1, Expression* m2, double& fitn1, double& fitn2, bool draw);
-void p_drawScene(float pos1, float pos2, float x, float y, float pWidth);
+int p_pingpong(Expression* m1, Expression* m2, float& fitn1, float& fitn2, bool draw);
+void p_drawScene(float pos1, float pos2, float x, float y, int mr1, int mr2, float pWidth);
 
 void p_createPreset();
 //void p_createParents();
-void p_processGeneration(); // ~perform + fitness
+void p_processGeneration(int x1, int x2); // ~perform + fitness
+void p_multithreadedProcessGeneration();
+void p_regulator(bool detail);
 
 void p_display(int num, int width = 237, int height = 60);
 void p_displayInfo(Expression* e, bool detail = false);

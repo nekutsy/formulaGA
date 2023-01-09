@@ -8,47 +8,47 @@ class Member;
 
 #include "Equation.h"
 
-const int parentsCount = 500;
-const int generationSize = 5000;
-const int expectedSize = 40;
-const double sizeMultiplier = 0.005;
-const double outMultiplier = 1;
-const double unevenMultiplier = 15;
-const double nanPenalty = std::numeric_limits<float>::lowest();
-const bool useParents = true;
+const int parentsCount = 100;
+const int generationSize = 1000;
+extern const int constCount;
+const int threadCount = 10;
+const int mutexCount = parentsCount / threadCount;
 
-const bool pingPongSelection = false;
-const bool generateFuncPreset = true;
-const bool randFuncPresets = false;
+const int r_period = 30;
+const float r_baseMutation = 20;
+const float r_mutationInfluence = 20;
+const float r_baseExpectedSize = 15;
+const float r_baseOut = 15;
+const float r_baseUneven = 15;
+
+extern int expectedSize;
+extern float sizeMultiplier;
+extern float outMultiplier;
+extern float unevenMultiplier;
+extern float nanPenalty;
+extern float nanBonus;
+extern bool useParents;
+
+extern int stepNum;
+extern float mutationCount;
+extern float avgFitness;
+extern float maxFitness;
+
 extern int presetsCountPerVar;
 extern int varCount;
-extern double minVar;
-extern double maxVar;
-extern std::vector<std::vector<double>> presetParametrs;
-
-const int performThrCnt = 10;
-const int selectionThrCnt = 10;
-const int generationThrCnt = 10;
-
 extern int presetsCount;
-extern std::vector<double> constants;
+
+extern std::vector<float> constants;
 extern std::vector<std::string> constantNames;
-extern std::vector<std::vector<double>> variables;
+
 extern std::vector<std::string> varNames;
-extern int funcNumber;
-extern bool customTargetFunc;
-extern Member* targetFunc;
+extern std::vector<float> varValues;
 
-extern std::vector<double> varValues;
-extern std::vector<std::vector<double>> presets;
-extern std::vector<double> expectedResults;
-extern double mutationCount;
-extern double avgFitness;
-extern double maxFitness;
-extern Member* maxFitnM;
-
-extern std::mutex mu_parents;
-extern std::mutex mu_generation;
+extern std::vector<std::vector<float>> presets;
+extern std::vector<float> expectedResults;
 
 extern std::array<Member*, parentsCount> parents;
 extern std::array<Member*, generationSize> generation;
+extern std::array<std::mutex, mutexCount> mu_parents;
+
+//extern std::mutex mu_parents;

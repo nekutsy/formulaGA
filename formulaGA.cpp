@@ -7,12 +7,12 @@
 #include "Global.h"
 
 int main() {
-	init(1);
+	init(2);
 	srand(time(0));
 	char ch;
 	bool isRun = true, showInfo;
 	int stepCount = 0;
-	long double preMax;
+	float preMax;
 	time_t t = 0;
 
 	createPreset();
@@ -25,13 +25,14 @@ int main() {
 		std::cout << "step count: ";
 		std::cin >> stepCount;
 		t = time(0);
-		for (int i = 0; i < stepCount; i++) {
+		for (int i = 0; i < stepCount; i++, stepNum++) {
 			if (showInfo) {
-				std::cout << "step: " << i << std::endl;
+				std::cout << "step: " << i + 1 << "/" << stepCount << " (" << stepNum << ")" << std::endl;
 				std::cout << "avgFitness: " << avgFitness << std::endl;
 				std::cout << "maxFitness: " << maxFitness << std::endl;
-				std::cout << std::endl;
 			}
+			regulator(showInfo);
+
 			//createGeneration();
 			multithreadedCreateGeneration();
 			processGeneration();
@@ -40,13 +41,13 @@ int main() {
 		}
 		//std::cout << "time: " << time(0) - t << std::endl;
 		std::cout << "improve: " << maxFitness - preMax << std::endl;
-		std::cout << "maxFitness: " << maxFitness << std::endl;
 		Member* b = parents[0];
 		for (int i = 0; i < parentsCount; i++)
 			if (parents[i]->fitn > b->fitn) {
 				b = parents[i];
 			}
-		std::cout << "best: " << b->getName() << " = y" << std::endl;
+		std::cout << "best: " << std::endl;
+		displayInfo(dynamic_cast<Expression*>(b), true);
 
 		std::cout << std::endl;
 		std::cout << "continue(y/n): ";

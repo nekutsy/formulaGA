@@ -2,45 +2,58 @@
 
 #include <math.h>
 
-int presetsCountPerVar = 5;
-int varCount = 4;
-double minVar = -10;
-double maxVar = 10;
+int expectedSize = 20;
+float sizeMultiplier = -0.01;
+float outMultiplier = -50;
+float unevenMultiplier = -20;
+float nanPenalty = -1000000000000;
+float nanBonus = 1000000;
+bool useParents = true;
+
+int presetsCountPerVar = 1500;
+int varCount = 1;
 
 int presetsCount = presetsCountPerVar * varCount;
-double mutationCount = 50;
-double mScore = 5;
-double avgFitness = 0;
-double maxFitness = std::numeric_limits<double>::lowest();
+int stepNum = 0;
+float mutationCount = 50;
+float avgFitness = 0;
+float maxFitness = std::numeric_limits<float>::lowest();
 Member* maxFitnM = 0;
-int funcNumber = 6;
-Member* targetFunc;
 
-std::vector<double> constants = {
+std::vector<float> constants = {
 	1, -1,
 	2, -2,
-	10, 5,
-	0.1
-	//3.14159265359,
+	3, -3,
+	4, 5,
+	6, 7,
+	8, 9,
+	10, 15,
+	25, 100,
+	0.5, 0.1,
 };
+const int constCount = constants.size();
 std::vector<std::string> constantNames = {
 	"1", "-1",
 	"2", "-2",
-	"10", "5",
-	"0.1",
+	"3", "-3",
+	"4", "5",
+	"6", "7",
+	"8", "9",
+	"10", "15",
+	"25", "100",
+	"0.5", "0.1",
 };
-std::vector<std::vector<double>> variables;
+
+std::vector<float> varValues;
 std::vector<std::string> varNames = {
-	"x", "y", "vx", "vy", "p1", "v1", "p2", "v2",
 	"x", "a", "b", "c", "d", "e", "k", "l",
 };
 
-std::vector<double> expectedResults;
+std::vector<float> expectedResults;
+std::vector<std::vector<float>> presets;
 
-std::vector<double> varValues;
-std::vector<std::vector<double>> presets;
-
-std::mutex mu_parents;
+//std::mutex mu_parents;
 
 std::array<Member*, parentsCount> parents;
 std::array<Member*, generationSize> generation;
+std::array<std::mutex, mutexCount> mu_parents;

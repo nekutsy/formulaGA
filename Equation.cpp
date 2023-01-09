@@ -10,11 +10,11 @@ const std::vector<Operation>op = {
 	//Operation("dif", operations::dif, operations::names::dif, std::numeric_limits<int>::max(), 2),
 	Operation("mult", operations::mult, operations::names::mult, std::numeric_limits<int>::max(), 2),
 	Operation("div", operations::div, operations::names::div, 2, 2),
-	//Operation("pow", operations::pow, operations::names::pow, 2, 2),
+	Operation("pow", operations::pow, operations::names::pow, 2, 2),
 	Operation("sqrt", operations::sqrt, operations::names::sqrt, 1, 1),
-	//Operation("sin", operations::sin, operations::names::sin, 1, 1),
-	//Operation("cos", operations::cos, operations::names::cos, 1, 1),
-	//Operation("tan", operations::tan, operations::names::tan, 1, 1),
+	Operation("sin", operations::sin, operations::names::sin, 1, 1),
+	Operation("cos", operations::cos, operations::names::cos, 1, 1),
+	Operation("tan", operations::tan, operations::names::tan, 1, 1),
 	Operation("abs", operations::abs, operations::names::abs, 1, 1),
 	Operation("mod", operations::mod, operations::names::mod, 2, 2),
 	Operation("max", operations::max, operations::names::max, std::numeric_limits<int>::max(), 2),
@@ -24,31 +24,33 @@ const int operationsCount = op.size();
 
 Member::Member(int OPERATION) : operation(OPERATION) {}
 Member::~Member() {}
-double Expression::fitness() {
-	double sizeW = 0, outW = 0, nanW = 0, unevenW = 0, preOut = 0;
-	sizeW += -pow(size - expectedSize, 2) * sizeMultiplier;
+float Expression::fitness() {
+	float preOut = 0;
+	fitn = pow(size - expectedSize, 2) * sizeMultiplier;
 
 	for (int i = 0; i < presetsCount; i++) {
-		long double out = expectedResults[i] - getResult(i);
+		float out = expectedResults[i] - getResult(i);
 		if (getResult(i) * 0 != getResult(i) * 0) {
 			if (expectedResults[i] * 0 == expectedResults[i] * 0)
-				nanW += 1;
+				fitn += nanPenalty;
+			else
+				fitn += nanBonus;
 		}
 		else
 			if (out * 0 == out * 0) {
-				double uw = pow(out, 2) * outMultiplier;
+				float uw = pow(out, 2) * outMultiplier;
 				//for (int j = 0; j < varCount && false; j++) outW -= uw * std::abs(presets[i][constants.size() + j] - presets[std::max(i - 1, 0)][constants.size() + j]);
-				outW -= uw;
+				fitn += uw;
 			}
 
 		if (i != 0 && out * 0 == out * 0 && preOut * 0 == preOut * 0) {
-			double uv = std::pow(preOut - out, 2) * unevenMultiplier;
+			float uv = std::pow(preOut - out, 2) * unevenMultiplier;
 			//for (int j = 0; j < varCount && false; j++) unevenW -= uv * std::abs(presets[i][constants.size() + j] - presets[i - 1][constants.size() + j]);
-			unevenW -= uv;
+			fitn += uv;
 		}
 		preOut = out;
 	}
-	fitn = sizeW + (outW + unevenW) / presetsCount + nanW / presetsCount * nanPenalty;
+	fitn /= presetsCount;
 	return fitn;
 }
 
@@ -159,7 +161,7 @@ void Expression::perform() {
 	for (int i = 0; i < presetsCount; i++)
 		results[i] = op[operation].func(members, i);
 }
-double Expression::perform(std::vector<double> vars) {
+float Expression::perform(std::vector<float> vars) {
 	for (int i = 0; i < mSize; i++)
 		members[i]->perform(vars);
 	results[presetsCount] = op[operation].func(members, presetsCount);
@@ -173,12 +175,24 @@ std::string Expression::getName() {
 		names[i] = members[i]->getName();
 	return op[operation].getName(names);
 }
-double Expression::getResult(int i) {
+float Expression::getResult(int i) {
 	return results[i];
 }
 Member* Expression::getMember(int i) {
 	return members[i];
 }
+bool Expression::operator==(Member& right) {
+	if (right.operation != operation)
+		return false;
+	Expression& e = dynamic_cast<Expression&>(right);
+	if (mSize != e.mSize || size != e.size)
+		return false;
+	for (int i = 0; i < mSize; i++)
+		if (!((*members[i]) == (*e.members[i])))
+			return false;
+	return true;
+}
+
 Const::Const(int M_TYPE) : Member(), mType(M_TYPE) {
 	Member::operation = -1;
 	resize();
@@ -188,19 +202,26 @@ void Const::resize() {
 	mSize = 1;
 }
 
-double Const::fitness() { return std::numeric_limits<double>::lowest(); }
+float Const::fitness() { return std::numeric_limits<float>::lowest(); }
 void Const::perform() {}
-double Const::perform(std::vector<double> vars) {
+float Const::perform(std::vector<float> vars) {
 	return constants[mType];
 }
 std::string Const::getName() {
 	return constantNames[mType];
 }
-double Const::getResult(int i) {
+float Const::getResult(int i) {
 	return constants[mType];
 }
 Member* Const::getMember(int i) {
 	return 0;
+}
+bool Const::operator==(Member& right) {
+	if (right.operation != -1)
+		return false;
+	if (dynamic_cast<Const&>(right).mType != mType)
+		return false;
+	return true;
 }
 
 Var::Var(int M_TYPE) : Member(), mType(M_TYPE) {
@@ -211,22 +232,29 @@ void Var::resize() {
 	size = 1;
 	mSize = 1;
 }
-double Var::fitness() { return std::numeric_limits<double>::lowest(); }
+float Var::fitness() { return std::numeric_limits<float>::lowest(); }
 void Var::perform() {}
-double Var::perform(std::vector<double> vars) {
+float Var::perform(std::vector<float> vars) {
 	result = vars[mType];
 	return result;
 }
 std::string Var::getName() {
 	return varNames[mType];
 }
-double Var::getResult(int i) {
+float Var::getResult(int i) {
 	if (i == presetsCount)
 		return result;
 	return presets[i][mType];
 }
 Member* Var::getMember(int i) {
 	return 0;
+}
+bool Var::operator==(Member& right) {
+	if (right.operation != -2)
+		return false;
+	if (dynamic_cast<Var&>(right).mType != mType)
+		return false;
+	return true;
 }
 
 Member* getAbsoluteMember(Member* m, int num, Member*& parent) {
@@ -289,64 +317,64 @@ Member* randMember(int mSize, int maxDeep, int opType) {
 	return new Expression(out, operation);
 }
 
-double none(double left, double right) { return 0.0; }
-double plus(double left, double right) { return left + right; }
-double minus(double left, double right) { return left - right; }
-double mult(double left, double right) { return left * right; }
-//double divide(double left, double right) { return left / right; }
-double sqrt(double left, double right) { return pow(left, 1 / right); }
+float none(float left, float right) { return 0.0; }
+float plus(float left, float right) { return left + right; }
+float minus(float left, float right) { return left - right; }
+float mult(float left, float right) { return left * right; }
+//float divide(float left, float right) { return left / right; }
+float sqrt(float left, float right) { return pow(left, 1 / right); }
 
-double operations::none(std::vector<Member*>& in, int presetNum) { return std::numeric_limits<double>::quiet_NaN(); }
-double operations::sum(std::vector<Member*>& in, int presetNum) {
-	double out(in[0]->getResult(presetNum));
+float operations::none(std::vector<Member*>& in, int presetNum) { return std::numeric_limits<float>::quiet_NaN(); }
+float operations::sum(std::vector<Member*>& in, int presetNum) {
+	float out(in[0]->getResult(presetNum));
 	for (int i = 1; i < in.size(); i++)
 		out += in[i]->getResult(presetNum);
 	return out;
 }
-double operations::dif(std::vector<Member*>& in, int presetNum) {
-	double out(in[0]->getResult(presetNum));
+float operations::dif(std::vector<Member*>& in, int presetNum) {
+	float out(in[0]->getResult(presetNum));
 	for (int i = 1; i < in.size(); i++)
 		out -= in[i]->getResult(presetNum);
 	return out;
 }
-double operations::mult(std::vector<Member*>& in, int presetNum) {
-	double out(in[0]->getResult(presetNum));
+float operations::mult(std::vector<Member*>& in, int presetNum) {
+	float out(in[0]->getResult(presetNum));
 	for (int i = 1; i < in.size(); i++)
 		out *= in[i]->getResult(presetNum);
 	return out;
 }
-double operations::pow(std::vector<Member*>&in, int presetNum) {
+float operations::pow(std::vector<Member*>&in, int presetNum) {
 	return std::pow(in[0]->getResult(presetNum), in[1]->getResult(presetNum));
 }
-double operations::div(std::vector<Member*>&in, int presetNum) {
+float operations::div(std::vector<Member*>&in, int presetNum) {
 	return in[0]->getResult(presetNum) / in[1]->getResult(presetNum);
 }
-double operations::sqrt(std::vector<Member*>&in, int presetNum) {
+float operations::sqrt(std::vector<Member*>&in, int presetNum) {
 	return std::sqrt(in[0]->getResult(presetNum));
 }
-double operations::abs(std::vector<Member*>&in, int presetNum) {
+float operations::abs(std::vector<Member*>&in, int presetNum) {
 	return std::abs(in[0]->getResult(presetNum));
 }
-double operations::sin(std::vector<Member*>&in, int presetNum) {
+float operations::sin(std::vector<Member*>&in, int presetNum) {
 	return std::sin(in[0]->getResult(presetNum));
 }
-double operations::cos(std::vector<Member*>&in, int presetNum) {
+float operations::cos(std::vector<Member*>&in, int presetNum) {
 	return std::cos(in[0]->getResult(presetNum));
 }
-double operations::tan(std::vector<Member*>&in, int presetNum) {
+float operations::tan(std::vector<Member*>&in, int presetNum) {
 	return std::tan(in[0]->getResult(presetNum));
 }
-double operations::mod(std::vector<Member*>&in, int presetNum) {
+float operations::mod(std::vector<Member*>&in, int presetNum) {
 	return std::fmod(in[0]->getResult(presetNum), in[1]->getResult(presetNum));
 }
-double operations::max(std::vector<Member*>&in, int presetNum) {
-	double out = in[0]->getResult(presetNum);
+float operations::max(std::vector<Member*>&in, int presetNum) {
+	float out = in[0]->getResult(presetNum);
 	for (int i = 1; i < in.size(); i++)
 		out = std::max(out, in[i]->getResult(presetNum));
 	return out;
 }
-double operations::min(std::vector<Member*>& in, int presetNum) {
-	double out = in[0]->getResult(presetNum);
+float operations::min(std::vector<Member*>& in, int presetNum) {
+	float out = in[0]->getResult(presetNum);
 	for (int i = 1; i < in.size(); i++)
 		out = std::min(out, in[i]->getResult(presetNum));
 	return out;
@@ -408,4 +436,4 @@ std::string operations::names::min(std::vector<std::string> in) {
 	return out + ")";
 }
 
-Operation::Operation(std::string NAME = "_EMPTRY_OPERATION_", double(*FUNC)(std::vector<Member*>&, int) = operations::none, std::string(*GET_NAME)(std::vector<std::string>) = operations::names::none, int MAX_MEMBERS = std::numeric_limits<int>::max(), int MIN_MEMBERS = 0) : name(NAME), func(FUNC), getName(GET_NAME), maxMembers(MAX_MEMBERS), minMembers(MIN_MEMBERS) {}
+Operation::Operation(std::string NAME = "_EMPTRY_OPERATION_", float(*FUNC)(std::vector<Member*>&, int) = operations::none, std::string(*GET_NAME)(std::vector<std::string>) = operations::names::none, int MAX_MEMBERS = std::numeric_limits<int>::max(), int MIN_MEMBERS = 0) : name(NAME), func(FUNC), getName(GET_NAME), maxMembers(MAX_MEMBERS), minMembers(MIN_MEMBERS) {}

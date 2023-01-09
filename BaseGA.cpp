@@ -37,19 +37,9 @@ std::vector<void (*)(Expression*)> m_funcs = {
 	},
 };
 
-void multithreadedCreateGeneration() {
-	const int fPerThread = parentsCount / generationThrCnt;
-	std::thread thr[generationThrCnt];
-	for (int i = 0; i < generationThrCnt; i++)
-		thr[i] = std::thread(createGeneration, i * fPerThread, (i + 1) * fPerThread);
-
-	for (int i = 0; i < generationThrCnt; i++)
-		thr[i].join();
-}
-
 void createGeneration(int x1, int x2) {
 	int childCount = generationSize / parentsCount;
-	for (int i = x1; i < x2; i++) {
+	for (int i = x1 * parentsCount / generationSize; i < x2 * parentsCount / generationSize; i++) {
 		for (int j = 0; j < childCount; j++) {
 			Member* child = duplicate(parents[i]);
 			for (int k = 0; k < mutationCount; k++)
@@ -66,75 +56,68 @@ void performGeneration(int x1, int x2) {
 	}
 }
 
-void multithreadedPerform() {
-	const int fPerThread = generationSize / performThrCnt;
-	std::thread thr[performThrCnt];
-	for (int i = 0; i < performThrCnt; i++)
-		thr[i] = std::thread(performGeneration, i * fPerThread, (i + 1) * fPerThread);
-
-	for (int i = 0; i < performThrCnt; i++)
-		thr[i].join();
-}
-
 void selection(int x1, int x2) {
 	for (int i = x1; i < x2; i++) {
-		long double fitn = generation[i]->fitn;
+		float fitn = generation[i]->fitn;
 		for (int j = 0; j < parentsCount; j++) {
-			mu_parents.lock();
+			mu_parents[j / threadCount].lock();
 			if (fitn > parents[j]->fitn) {
-				mu_parents.unlock();
+				mu_parents[j / threadCount].unlock();
 				bool unique = true;
 				for (int k = 0; k < parentsCount && unique; k++) {
-					bool identity = true;
-					bool improv = true;
-					mu_parents.lock();
-					if (fitn <= parents[k]->fitn)
-						improv = false;
-					for (int l = 0; l < presetsCount && (identity || improv); l++) {
-						if (generation[i]->getResult(l) != parents[k]->getResult(l))
-							identity = false;
-					}
-					mu_parents.unlock();
-					unique = !identity || improv;
+					mu_parents[k / threadCount].lock();
+					unique = !((*generation[i]) == (*parents[k]));
+					mu_parents[k / threadCount].unlock();
 				}
 				if (unique) {
-					mu_parents.lock();
+					mu_parents[j / threadCount].lock();
 					delete parents[j];
 					parents[j] = generation[i];
 					generation[i] = 0;
-					mu_parents.unlock();
+					mu_parents[j / threadCount].unlock();
 				}
 				break;
 			}
 			else
-				mu_parents.unlock();
+				mu_parents[j / threadCount].unlock();
 		}
-		if (fitn > maxFitness)
-			maxFitness = fitn;
 		if (generation[i])
 			delete generation[i];
 	}
 }
 
+void multithreadUse(void (*func)(int, int)) {
+	const int fPerThread = generationSize / threadCount;
+	std::thread thr[threadCount];
+	for (int i = 0; i < threadCount; i++)
+		thr[i] = std::thread(func, i * fPerThread, (i + 1) * fPerThread);
+
+	for (int i = 0; i < threadCount; i++)
+		thr[i].join();
+}
+
 void multithreadedSelection() {
 	if (!useParents)
 		for (int i = 0; i < parentsCount; i++)
-			parents[i]->fitn = std::numeric_limits<long double>::lowest();
+			parents[i]->fitn = std::numeric_limits<float>::lowest();
+	maxFitness = std::numeric_limits<float>::lowest();
 
-	const int fPerThread = generationSize / selectionThrCnt;
-	std::thread thr[selectionThrCnt];
-
-	maxFitness = std::numeric_limits<double>::lowest();
-	for (int i = 0; i < selectionThrCnt; i++)
-		thr[i] = std::thread(selection, i * fPerThread, (i + 1) * fPerThread);
-
-	for (int i = 0; i < selectionThrCnt; i++)
-		thr[i].join();
+	multithreadUse(selection);
 
 	avgFitness = 0;
-	for (int i = 0; i < parentsCount; i++)
-		avgFitness += parents[i]->fitn;
+	for (int i = 0; i < parentsCount; i++) {
+		float fitn = parents[i]->fitn;
+		avgFitness += fitn;
+		maxFitness = std::max(fitn, maxFitness);
+	}
 	avgFitness /= parentsCount;
+}
+
+void multithreadedPerform() {
+	multithreadUse(performGeneration);
+}
+void multithreadedCreateGeneration() {
+	multithreadUse(createGeneration);
 }
 
 void mutate(Member* m) {
