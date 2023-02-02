@@ -8,15 +8,15 @@ class Member;
 
 #include "Equation.h"
 
-const int parentsCount = 100;
-const int generationSize = 1000;
+const int parentsCount = 50;
+const int generationSize = 750;
 extern const int constCount;
 const int threadCount = 10;
 const int mutexCount = parentsCount / threadCount;
 
-const int r_period = 30;
-const float r_baseMutation = 20;
-const float r_mutationInfluence = 20;
+const int r_period = 40;
+const float r_baseMutation = 25;
+const float r_mutationInfluence = 25;
 const float r_baseExpectedSize = 15;
 const float r_baseOut = 15;
 const float r_baseUneven = 15;

@@ -7,7 +7,7 @@
 
 std::string desiredValueName;
 std::vector<int> ignoredValues = { };
-std::vector<int> dateValues = { };
+std::vector<int> dateValues = {  };
 
 void c_createPreset() {
 	ignoredValues.push_back(desiredValueNum);

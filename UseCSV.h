@@ -6,7 +6,7 @@
 #include "Global.h"
 #include "BaseGA.h"
 
-const int maxLinesCount = 10000;
+const int maxLinesCount = 100000;
 const int desiredValueNum = 0;
 const float referenceDate = 2000 * 365.24219878;
 

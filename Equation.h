@@ -11,16 +11,6 @@ enum operationsName {
 	n_sqrt
 };
 
-//operations
- /*
-float none(float left, float right);
-float plus(float left, float right);
-float minus(float left, float right);
-float mult(float left, float right);
-float divide(float left, float right);
-float sqrt(float left, float right);
-*/
-
 namespace operations {
 	float none(std::vector<Member*>&, int);
 	float sum(std::vector<Member*>&, int);

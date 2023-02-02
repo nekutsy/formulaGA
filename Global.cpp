@@ -2,15 +2,15 @@
 
 #include <math.h>
 
-int expectedSize = 20;
-float sizeMultiplier = -0.01;
-float outMultiplier = -50;
-float unevenMultiplier = -20;
+int expectedSize = 5;
+float sizeMultiplier = -1;
+float outMultiplier = -5;
+float unevenMultiplier = -50;
 float nanPenalty = -1000000000000;
 float nanBonus = 1000000;
 bool useParents = true;
 
-int presetsCountPerVar = 1500;
+int presetsCountPerVar = 75;
 int varCount = 1;
 
 int presetsCount = presetsCountPerVar * varCount;
