@@ -1,5 +1,6 @@
 # Default ignored files
 *.csv
+template.txt
 /shelf/
 /workspace.xml
 # Datasource local storage ignored files
