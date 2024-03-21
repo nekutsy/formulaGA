@@ -1,7 +1,7 @@
 #include "Equation.h"
 
 #include <iostream>
-#include <string_view>
+#include <string>
 
 #include "Global.h"
 

@@ -7,7 +7,7 @@
 #include "Global.h"
 
 int main() {
-	init(2);
+	init(0);
 	srand(time(0));
 	char ch;
 	bool isRun = true, showInfo;
@@ -82,7 +82,7 @@ int main() {
 				} while (num < -1 || num >= parentsCount);
 				if (num == -1)
 					break;
-				display(num, 237, 60);
+				display(num, 100, 40);
 			}
 			std::cout << std::endl;
 		}

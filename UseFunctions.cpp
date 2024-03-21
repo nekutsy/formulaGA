@@ -86,7 +86,7 @@ void f_display(int num, int width, int height) {
 	std::cout << "scale: ";
 	std::cin >> scale;
 	std::cout << parents[num]->getName() << std::endl;
-	f_draw(dynamic_cast<Expression*>(parents[num]), scale, 237, 60, 0, 0);
+	f_draw(dynamic_cast<Expression*>(parents[num]), scale, width, height, 0, 0);
 }
 
 const int miniWidth = 20, miniHight = 10;

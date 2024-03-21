@@ -8,10 +8,10 @@ class Member;
 
 #include "Equation.h"
 
-const int parentsCount = 50;
-const int generationSize = 750;
+const int parentsCount = 128;
+const int generationSize = 4096;
 extern const int constCount;
-const int threadCount = 10;
+const int threadCount = 8;
 const int mutexCount = parentsCount / threadCount;
 
 const int r_period = 40;
